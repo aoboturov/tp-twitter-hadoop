@@ -4,6 +4,7 @@ import com.oboturov.ht.Tweet;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -16,9 +17,12 @@ import java.util.Iterator;
  */
 public class TweetsReader {
 
+    private final static Logger logger = Logger.getLogger(TweetsReader.class);
+
     public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, LongWritable, Tweet> {
 
         private static final String HTTP_TWITTER_COM = "http://twitter.com/";
+        private static final String HTTP_WWW_TWITTER_COM = "http://www.twitter.com/";
         private static final String EMPTY_POST_INDICATION = "No Post Title";
 
         private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -43,15 +47,17 @@ public class TweetsReader {
                         this.time = dateFormat.parse(text).getTime();
                     } catch (final ParseException e) {
                         skipTweet = true;
-                        // TODO: add logger.
+                        logger.error("Wrong date format for date: '"+text+"'");
                     }
                     return;
                 case 'U':
                     if (text.startsWith(HTTP_TWITTER_COM)) {
                         this.user = "@"+text.substring(HTTP_TWITTER_COM.length());
+                    } else if (text.startsWith(HTTP_WWW_TWITTER_COM)) {
+                        this.user = "@"+text.substring(HTTP_WWW_TWITTER_COM.length());
                     } else {
                         this.user = text;
-                        // TODO: report normalisation error.
+                        logger.error("Not normalized user name: '"+text+"'");
                     }
                     return;
                 case 'W':
@@ -63,10 +69,19 @@ public class TweetsReader {
                 default:
                     return;
             }
-            if (skipTweet) {
-                return;
+            if (this.time == null || this.user == null || this.post == null) {
+                skipTweet = true;
             }
-            output.collect(new LongWritable(this.time), new Tweet(this.user, this.time, this.post));
+            try {
+                if (skipTweet) {
+                    return;
+                }
+                output.collect(new LongWritable(this.time), new Tweet(this.user, this.time, this.post));
+            } finally {
+                this.time = null;
+                this.user = null;
+                this.post = null;
+            }
         }
     }
 

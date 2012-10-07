@@ -7,6 +7,11 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <properties>
+        <hadoop-distributive-version>0.20.205.0</hadoop-distributive-version>
+        <hadoop-compatible-log4j-version>1.2.15</hadoop-compatible-log4j-version>
+    </properties>
+
     <developers>
         <developer>
             <name>Artem Oboturov</name>
@@ -39,9 +44,33 @@
 
     <dependencies>
         <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${hadoop-compatible-log4j-version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mail</artifactId>
+                    <groupId>javax.mail</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jms</artifactId>
+                    <groupId>javax.jms</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jmxri</artifactId>
+                    <groupId>com.sun.jmx</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jmxtools</artifactId>
+                    <groupId>com.sun.jdmk</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-core</artifactId>
-            <version>0.20.205.0</version>
+            <version>${hadoop-distributive-version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
