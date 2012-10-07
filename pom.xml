@@ -7,8 +7,34 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <developers>
+        <developer>
+            <name>Artem Oboturov</name>
+            <email>oboturov@gmail.com</email>
+        </developer>
+    </developers>
+
     <build>
         <testSourceDirectory>src/test/java</testSourceDirectory>
+        <testResources>
+            <testResource>
+                <directory>src/test/data</directory>
+                <includes>
+                    <include>**/*.txt</include>
+                </includes>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <dependencies>
@@ -17,6 +43,18 @@
             <artifactId>hadoop-core</artifactId>
             <version>0.20.205.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.8</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
