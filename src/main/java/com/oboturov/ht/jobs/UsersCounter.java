@@ -25,7 +25,7 @@ public class UsersCounter {
     private static class UserMap extends MapReduceBase implements Mapper<LongWritable, Tweet, Text, LongWritable> {
         @Override
         public void map(final LongWritable key, final Tweet tweet, final OutputCollector<Text, LongWritable> output, final Reporter reporter) throws IOException {
-            output.collect(new Text(tweet.getUser()), new LongWritable(1L));
+            output.collect(new Text(tweet.getUser().getName()), new LongWritable(1L));
         }
     }
 

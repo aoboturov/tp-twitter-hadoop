@@ -12,17 +12,18 @@ import java.io.IOException;
  */
 public class Tweet implements Writable {
 
-    private String user;
+    private User user;
     private Long time;
     private String post;
 
     public Tweet(final String user, final Long time, final String post) {
-        this.user = user;
+        this.user = new User();
+        this.user.setName(user);
         this.time = time;
         this.post = post;
     }
 
-    public String getUser() {
+    public User getUser() {
         return user;
     }
 
@@ -35,13 +36,13 @@ public class Tweet implements Writable {
     }
 
     public void write(final DataOutput dataOutput) throws IOException {
-        dataOutput.writeUTF(user);
+        user.write(dataOutput);
         dataOutput.writeLong(time);
         dataOutput.writeUTF(post);
     }
 
     public void readFields(final DataInput dataInput) throws IOException {
-        this.user = dataInput.readUTF();
+        this.user.readFields(dataInput);
         this.time = dataInput.readLong();
         this.post = dataInput.readUTF();
     }
