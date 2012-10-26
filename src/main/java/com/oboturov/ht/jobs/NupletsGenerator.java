@@ -5,30 +5,52 @@ import com.oboturov.ht.Tweet;
 import com.oboturov.ht.User;
 import com.oboturov.ht.etl.NupletCreator;
 import com.oboturov.ht.etl.TweetsReader;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.WritableComparator;
 import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.mapred.lib.ChainMapper;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 
 /**
  * @author aoboturov
  */
-public class NupletsGenerator {
+public class NupletsGenerator extends Configured implements Tool {
 
-    public static void main(String args[]) throws Exception {
-        final JobConf conf = new JobConf();
-        conf.setJobName("nuplets-generator");
+    static class UserComparator extends WritableComparator {
+        public UserComparator() {
+            super(User.class, true);
+        }
+    }
 
-        conf.setOutputKeyClass(User.class);
-        conf.setOutputValueClass(Nuplet.class);
+    static class NupletComparator extends WritableComparator {
+        public NupletComparator() {
+            super(Nuplet.class, true);
+        }
+    }
 
-        conf.setInputFormat(TextInputFormat.class);
-        conf.setOutputFormat(TextOutputFormat.class);
+    @Override
+    public int run(final String[] args) throws Exception {
+        final Configuration config = getConf();
+
+        final JobConf jobConf = new JobConf(config, NupletsGenerator.class);
+        jobConf.setJobName("nuplets-generator");
+
+        jobConf.setOutputKeyClass(User.class);
+        jobConf.setOutputValueClass(Nuplet.class);
+        jobConf.setOutputKeyComparatorClass(UserComparator.class);
+        jobConf.setOutputValueGroupingComparator(NupletComparator.class);
+
+        jobConf.setInputFormat(TextInputFormat.class);
+        jobConf.setOutputFormat(TextOutputFormat.class);
 
         // Extract tweets
         ChainMapper.addMapper(
-                conf,
+                jobConf,
                 TweetsReader.Map.class,
                 LongWritable.class,
                 Text.class,
@@ -39,7 +61,7 @@ public class NupletsGenerator {
         );
         // Map tweets to count measure.
         ChainMapper.addMapper(
-                conf,
+                jobConf,
                 NupletCreator.Map.class,
                 LongWritable.class,
                 Tweet.class,
@@ -49,9 +71,22 @@ public class NupletsGenerator {
                 new JobConf(false)
         );
 
-        FileInputFormat.setInputPaths(conf, new Path(args[0]));
-        FileOutputFormat.setOutputPath(conf, new Path(args[1]));
+        FileInputFormat.setInputPaths(jobConf, new Path(args[args.length-2]));
+        FileOutputFormat.setOutputPath(jobConf, new Path(args[args.length-1]));
 
-        JobClient.runJob(conf);
+        JobClient.runJob(jobConf);
+
+        return 0;
+    }
+
+    public static void main(final String args[]) throws Exception {
+        for (String arg: args) {
+            System.out.println(arg);
+        }
+
+        // Let ToolRunner handle generic command-line options
+        int res = ToolRunner.run(new NupletsGenerator(), args);
+
+        System.exit(res);
     }
 }

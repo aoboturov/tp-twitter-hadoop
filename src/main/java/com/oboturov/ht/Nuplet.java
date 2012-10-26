@@ -1,6 +1,6 @@
 package com.oboturov.ht;
 
-import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * @author aoboturov
  */
-public class Nuplet implements Writable {
+public class Nuplet implements WritableComparable<Nuplet> {
 
     private User user;
     private Item item;
@@ -41,16 +41,30 @@ public class Nuplet implements Writable {
 
     @Override
     public void write(final DataOutput dataOutput) throws IOException {
-        user.write(dataOutput);
-        item.write(dataOutput);
+        User.writeWritable(user, dataOutput);
+        Item.writeWritable(item, dataOutput);
         dataOutput.writeUTF(keys);
     }
 
     @Override
     public void readFields(final DataInput dataInput) throws IOException {
-        this.user.readFields(dataInput);
-        this.item.readFields(dataInput);
+        this.user = User.readWritable(dataInput);
+        this.item = Item.readWritable(dataInput);
         this.keys = dataInput.readUTF();
+    }
+
+    @Override
+    public int compareTo(final Nuplet rhs) {
+        int res;
+        res = this.user.compareTo(rhs.getUser());
+        if ( res != 0) {
+            return res;
+        }
+        res = this.item.compareTo(rhs.getItem());
+        if ( res != 0) {
+            return res;
+        }
+        return this.keys.compareTo(rhs.getKeys());
     }
 
     @Override

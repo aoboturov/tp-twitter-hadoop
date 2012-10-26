@@ -1,6 +1,6 @@
 package com.oboturov.ht;
 
-import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * @author aoboturov
  */
-public class User implements Writable {
+public class User implements WritableComparable<User> {
 
     private String name;
 
@@ -29,6 +29,21 @@ public class User implements Writable {
     @Override
     public void readFields(final DataInput dataInput) throws IOException {
         this.name = dataInput.readUTF();
+    }
+
+    public static User readWritable(final DataInput dataInput) throws IOException {
+        final User anUser = new User();
+        anUser.name = dataInput.readUTF();
+        return anUser;
+    }
+
+    public static void writeWritable(final User anUser, final DataOutput dataOutput) throws IOException {
+        anUser.write(dataOutput);
+    }
+
+    @Override
+    public int compareTo(final User rhs) {
+        return this.name.compareTo(rhs.getName());
     }
 
     @Override

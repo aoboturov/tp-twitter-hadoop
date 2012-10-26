@@ -36,13 +36,13 @@ public class Tweet implements Writable {
     }
 
     public void write(final DataOutput dataOutput) throws IOException {
-        user.write(dataOutput);
+        User.writeWritable(user, dataOutput);
         dataOutput.writeLong(time);
         dataOutput.writeUTF(post);
     }
 
     public void readFields(final DataInput dataInput) throws IOException {
-        this.user.readFields(dataInput);
+        this.user = User.readWritable(dataInput);
         this.time = dataInput.readLong();
         this.post = dataInput.readUTF();
     }
