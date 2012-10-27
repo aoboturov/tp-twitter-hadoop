@@ -20,6 +20,12 @@
     </developers>
 
     <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/data</directory>
+            </resource>
+        </resources>
         <testSourceDirectory>src/test/java</testSourceDirectory>
         <testResources>
             <testResource>
@@ -85,6 +91,11 @@
             <groupId>com.twitter</groupId>
             <artifactId>twitter-text</artifactId>
             <version>1.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-ner</artifactId>
+            <version>1.2.6</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
