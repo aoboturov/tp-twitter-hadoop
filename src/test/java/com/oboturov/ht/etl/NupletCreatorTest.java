@@ -41,7 +41,7 @@ public class NupletCreatorTest {
         final Nuplet aNuplet = new Nuplet();
         aNuplet.setUser(deaconsnacks);
         aNuplet.setItem(new Item(ItemType.AT, "flytographer"));
-        aNuplet.setKeys(" Cheer up Liz:)");
+        aNuplet.setKey(new Key(KeyType.PLAIN_TEXT, " Cheer up Liz:)"));
 
         verify(output, atLeastOnce()).collect(
                 eq(deaconsnacks),
@@ -53,7 +53,7 @@ public class NupletCreatorTest {
         final Nuplet bNuplet = new Nuplet();
         bNuplet.setUser(holland_hotels);
         bNuplet.setItem(new Item(ItemType.URL, "http://bit.ly/mbGoR"));
-        bNuplet.setKeys("Eden Amsterdam American Hotel (****) on various dates for €110 .. ");
+        bNuplet.setKey(new Key(KeyType.PLAIN_TEXT, "Eden Amsterdam American Hotel (****) on various dates for €110 .. "));
 
         verify(output, atLeastOnce()).collect(
                 eq(holland_hotels),

@@ -13,7 +13,7 @@ public class Nuplet implements WritableComparable<Nuplet> {
 
     private User user;
     private Item item;
-    private String keys;
+    private Key key;
 
     public User getUser() {
         return user;
@@ -31,26 +31,26 @@ public class Nuplet implements WritableComparable<Nuplet> {
         this.item = item;
     }
 
-    public String getKeys() {
-        return keys;
+    public Key getKey() {
+        return key;
     }
 
-    public void setKeys(String keys) {
-        this.keys = keys;
+    public void setKey(Key key) {
+        this.key = key;
     }
 
     @Override
     public void write(final DataOutput dataOutput) throws IOException {
         User.writeWritable(user, dataOutput);
         Item.writeWritable(item, dataOutput);
-        dataOutput.writeUTF(keys);
+        Key.writeWritable(key, dataOutput);
     }
 
     @Override
     public void readFields(final DataInput dataInput) throws IOException {
         this.user = User.readWritable(dataInput);
         this.item = Item.readWritable(dataInput);
-        this.keys = dataInput.readUTF();
+        this.key = Key.readWritable(dataInput);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class Nuplet implements WritableComparable<Nuplet> {
         if ( res != 0) {
             return res;
         }
-        return this.keys.compareTo(rhs.getKeys());
+        return this.key.compareTo(rhs.getKey());
     }
 
     @Override
@@ -75,7 +75,7 @@ public class Nuplet implements WritableComparable<Nuplet> {
         Nuplet nuplet = (Nuplet) o;
 
         if (item != null ? !item.equals(nuplet.item) : nuplet.item != null) return false;
-        if (keys != null ? !keys.equals(nuplet.keys) : nuplet.keys != null) return false;
+        if (key != null ? !key.equals(nuplet.key) : nuplet.key != null) return false;
         if (user != null ? !user.equals(nuplet.user) : nuplet.user != null) return false;
 
         return true;
@@ -85,7 +85,7 @@ public class Nuplet implements WritableComparable<Nuplet> {
     public int hashCode() {
         int result = user != null ? user.hashCode() : 0;
         result = 31 * result + (item != null ? item.hashCode() : 0);
-        result = 31 * result + (keys != null ? keys.hashCode() : 0);
+        result = 31 * result + (key != null ? key.hashCode() : 0);
         return result;
     }
 
@@ -94,7 +94,7 @@ public class Nuplet implements WritableComparable<Nuplet> {
         return "Nuplet[\n"+
                 this.user.toString()+"\n"+
                 this.item.toString()+"\n"+
-                "keys='"+this.keys+"'\n"+
+                "keys='"+this.key +"'\n"+
                 "]";
     }
 }
