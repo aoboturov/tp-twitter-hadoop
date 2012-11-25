@@ -1,7 +1,7 @@
 package com.oboturov.ht;
 
 
-import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * @author aoboturov
  */
-public class Tweet implements Writable {
+public class Tweet implements WritableComparable<Tweet> {
 
     private User user;
     private Long time;
@@ -67,5 +67,13 @@ public class Tweet implements Writable {
         result = 31 * result + time.hashCode();
         result = 31 * result + post.hashCode();
         return result;
+    }
+
+    @Override
+    public int compareTo(final Tweet rhs) {
+        if ( this.equals(rhs)) {
+            return 0;
+        }
+        return this.time > rhs.time ? 1 : -1;
     }
 }

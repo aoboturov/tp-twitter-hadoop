@@ -14,6 +14,8 @@ public class Nuplet implements WritableComparable<Nuplet> {
     private User user;
     private Item item;
     private Key key;
+    // Meta-data.
+    private String lang = "";
 
     public User getUser() {
         return user;
@@ -39,11 +41,20 @@ public class Nuplet implements WritableComparable<Nuplet> {
         this.key = key;
     }
 
+    public String getLang() {
+        return lang;
+    }
+
+    public void setLang(String lang) {
+        this.lang = lang;
+    }
+
     @Override
     public void write(final DataOutput dataOutput) throws IOException {
         User.writeWritable(user, dataOutput);
         Item.writeWritable(item, dataOutput);
         Key.writeWritable(key, dataOutput);
+        dataOutput.writeUTF(lang);
     }
 
     @Override
@@ -51,6 +62,7 @@ public class Nuplet implements WritableComparable<Nuplet> {
         this.user = User.readWritable(dataInput);
         this.item = Item.readWritable(dataInput);
         this.key = Key.readWritable(dataInput);
+        this.lang = dataInput.readUTF();
     }
 
     @Override
@@ -95,6 +107,7 @@ public class Nuplet implements WritableComparable<Nuplet> {
                 this.user.toString()+"\n"+
                 this.item.toString()+"\n"+
                 "keys='"+this.key +"'\n"+
+                "lang='" + this.lang + "'\n"+
                 "]";
     }
 }
