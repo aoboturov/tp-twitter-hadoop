@@ -1,4 +1,4 @@
-package com.oboturov.ht.etl;
+package com.oboturov.ht.etl.language_identification;
 
 import com.oboturov.ht.KeyType;
 import com.oboturov.ht.Nuplet;
@@ -15,7 +15,7 @@ import java.io.IOException;
 /**
  * @author aoboturov
  */
-public class LanguageIdentification {
+public class LanguageIdentificationWithTika {
 
     public static class LanguageIdentificationMap extends MapReduceBase implements Mapper<User, Nuplet, User, Nuplet> {
         @Override

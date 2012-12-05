@@ -1,4 +1,4 @@
-package com.oboturov.ht.etl;
+package com.oboturov.ht.etl.language_identification;
 
 import org.apache.tika.language.LanguageIdentifier;
 import org.testng.annotations.Test;
@@ -12,7 +12,7 @@ import static org.testng.Assert.assertNotNull;
 /**
  * @author aoboturov
  */
-public class LanguageIdentificationTest {
+public class LanguageIdentificationWithTikaTest {
 
     @Test
     public void loads_languages_from_tika_library() throws IOException {
