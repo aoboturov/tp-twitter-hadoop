@@ -103,6 +103,11 @@
             <version>1.2</version>
         </dependency>
         <dependency>
+            <groupId>be.frma</groupId>
+            <artifactId>lang-guess</artifactId>
+            <version>0.0.8-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.9.0</version>
