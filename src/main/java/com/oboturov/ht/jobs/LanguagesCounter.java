@@ -41,7 +41,7 @@ public class LanguagesCounter extends Configured implements Tool {
     public int run(final String[] args) throws Exception {
         final Configuration config = getConf();
 
-        final JobConf jobConf = new JobConf(config, PartOne.class);
+        final JobConf jobConf = new JobConf(config, LanguagesCounter.class);
         jobConf.setJobName("languages-count");
 
         jobConf.setOutputKeyClass(User.class);
