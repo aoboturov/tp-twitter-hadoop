@@ -45,10 +45,10 @@ public class LanguageIdentificationWithLangGuess {
 
         @Override
         public void map(final User user, final Nuplet nuplet, final OutputCollector<User, Nuplet> outputCollector, final Reporter reporter) throws IOException {
-            if (KeyType.PLAIN_TEXT.equals(nuplet.getKey().getType())) {
+            if (KeyType.PLAIN_TEXT.equals(nuplet.getKeyword().getType())) {
                 try {
                     final Detector languageIdentifier = DetectorFactory.create();
-                    languageIdentifier.append(nuplet.getKey().getValue());
+                    languageIdentifier.append(nuplet.getKeyword().getValue());
                     final String detectedLanguage = languageIdentifier.detect();
                     nuplet.setLang(detectedLanguage);
                 } catch (LangDetectException ex) {
@@ -65,10 +65,10 @@ public class LanguageIdentificationWithLangGuess {
 
         @Override
         public void map(final User user, final Nuplet nuplet, final OutputCollector<User, Nuplet> outputCollector, final Reporter reporter) throws IOException {
-            if (KeyType.PLAIN_TEXT.equals(nuplet.getKey().getType())) {
+            if (KeyType.PLAIN_TEXT.equals(nuplet.getKeyword().getType())) {
                 try {
                     final Detector languageIdentifier = DetectorFactory.create();
-                    languageIdentifier.append(nuplet.getKey().getValue());
+                    languageIdentifier.append(nuplet.getKeyword().getValue());
                     final String detectedLanguage = languageIdentifier.detect();
                     if ("en".equals(detectedLanguage) || "uk".equals(detectedLanguage)) {
                         nuplet.setLang("en");

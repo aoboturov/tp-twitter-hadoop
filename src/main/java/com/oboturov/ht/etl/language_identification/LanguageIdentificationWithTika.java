@@ -20,8 +20,8 @@ public class LanguageIdentificationWithTika {
     public static class LanguageIdentificationMap extends MapReduceBase implements Mapper<User, Nuplet, User, Nuplet> {
         @Override
         public void map(final User user, final Nuplet nuplet, final OutputCollector<User, Nuplet> outputCollector, final Reporter reporter) throws IOException {
-            if (KeyType.PLAIN_TEXT.equals(nuplet.getKey().getType())) {
-                final LanguageIdentifier languageIdentifier = new LanguageIdentifier(nuplet.getKey().getValue());
+            if (KeyType.PLAIN_TEXT.equals(nuplet.getKeyword().getType())) {
+                final LanguageIdentifier languageIdentifier = new LanguageIdentifier(nuplet.getKeyword().getValue());
                 if (languageIdentifier.isReasonablyCertain()) {
                     nuplet.setLang(languageIdentifier.getLanguage());
                 }
@@ -36,8 +36,8 @@ public class LanguageIdentificationWithTika {
 
         @Override
         public void map(final User user, final Nuplet nuplet, final OutputCollector<User, Nuplet> outputCollector, final Reporter reporter) throws IOException {
-            if (KeyType.PLAIN_TEXT.equals(nuplet.getKey().getType())) {
-                final LanguageIdentifier languageIdentifier = new LanguageIdentifier(nuplet.getKey().getValue());
+            if (KeyType.PLAIN_TEXT.equals(nuplet.getKeyword().getType())) {
+                final LanguageIdentifier languageIdentifier = new LanguageIdentifier(nuplet.getKeyword().getValue());
                 final String detectedLanguage = languageIdentifier.getLanguage();
                 if (languageIdentifier.isReasonablyCertain() &&
                         ("en".equals(detectedLanguage) || "uk".equals(detectedLanguage)) ) {

@@ -64,7 +64,7 @@ public class NupletCreator {
                 final Item item = new Item(type, entity.getValue());
                 final Nuplet nuplet = new Nuplet();
                 nuplet.setUser(user);
-                nuplet.setKey(new Key(KeyType.PLAIN_TEXT, rawText));
+                nuplet.setKeyword(new Keyword(KeyType.PLAIN_TEXT, rawText));
                 nuplet.setItem(item);
                 output.collect(user, nuplet);
             }

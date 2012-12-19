@@ -9,17 +9,17 @@ import java.io.IOException;
 /**
  * @author aoboturov
  */
-public class Key implements WritableComparable<Key>{
+public class Keyword implements WritableComparable<Keyword>{
 
     private String type;
     private String value;
 
-    public Key(String type, String value) {
+    public Keyword(String type, String value) {
         this.type = type;
         this.value = value;
     }
 
-    private Key() {}
+    private Keyword() {}
 
     public String getType() {
         return type;
@@ -41,18 +41,18 @@ public class Key implements WritableComparable<Key>{
         this.value = dataInput.readUTF();
     }
 
-    public static void writeWritable(final Key aKey, final DataOutput dataOutput) throws IOException {
-        aKey.write(dataOutput);
+    public static void writeWritable(final Keyword aKeyword, final DataOutput dataOutput) throws IOException {
+        aKeyword.write(dataOutput);
     }
 
-    public static Key readWritable(final DataInput dataInput) throws IOException {
-        final Key aKey = new Key();
-        aKey.readFields(dataInput);
-        return aKey;
+    public static Keyword readWritable(final DataInput dataInput) throws IOException {
+        final Keyword aKeyword = new Keyword();
+        aKeyword.readFields(dataInput);
+        return aKeyword;
     }
 
     @Override
-    public int compareTo(final Key rhs) {
+    public int compareTo(final Keyword rhs) {
         int res = this.type.compareTo(rhs.getType());
         if ( res != 0) {
             return res;
@@ -65,10 +65,10 @@ public class Key implements WritableComparable<Key>{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Key key = (Key) o;
+        Keyword keyword = (Keyword) o;
 
-        if (type != null ? !type.equals(key.type) : key.type != null) return false;
-        if (value != null ? !value.equals(key.value) : key.value != null) return false;
+        if (type != null ? !type.equals(keyword.type) : keyword.type != null) return false;
+        if (value != null ? !value.equals(keyword.value) : keyword.value != null) return false;
 
         return true;
     }
@@ -82,6 +82,6 @@ public class Key implements WritableComparable<Key>{
 
     @Override
     public String toString() {
-        return "Key[type='"+this.type+"', value='"+this.value+"']";
+        return "Keyword[type='"+this.type+"', value='"+this.value+"']";
     }
 }
