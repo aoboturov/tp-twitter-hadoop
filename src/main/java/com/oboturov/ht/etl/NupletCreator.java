@@ -46,8 +46,8 @@ public class NupletCreator {
                 String type;
                 switch (entity.getType()) {
                     case CASHTAG:
-                        type = ItemType.CASH;
-                        break;
+                        // Do not support CASHTAGs in analysis phase.
+                        continue;
                     case HASHTAG:
                         type = ItemType.HASH;
                         break;
