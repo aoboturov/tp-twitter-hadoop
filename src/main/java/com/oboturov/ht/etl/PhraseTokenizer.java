@@ -1,6 +1,7 @@
 package com.oboturov.ht.etl;
 
 import com.oboturov.ht.*;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
@@ -23,7 +24,7 @@ import static org.apache.lucene.util.Version.LUCENE_40;
  */
 public class PhraseTokenizer {
 
-    public static class PhraseTokenizerMap extends MapReduceBase implements Mapper<User, Nuplet, User, Nuplet> {
+    public static class PhraseTokenizerMap extends MapReduceBase implements Mapper<User, Nuplet, NullWritable, Nuplet> {
 
         private final static Logger logger = Logger.getLogger(PhraseTokenizerMap.class);
 
@@ -66,7 +67,7 @@ public class PhraseTokenizer {
         }
 
         @Override
-        public void map(final User user, final Nuplet nuplet, final OutputCollector<User, Nuplet> outputCollector, final Reporter reporter) throws IOException {
+        public void map(final User user, final Nuplet nuplet, final OutputCollector<NullWritable, Nuplet> outputCollector, final Reporter reporter) throws IOException {
             final Analyzer analyzer = analyzerMap.get(nuplet.getLang());
             if (analyzer == null) {
                 // Skip those phrases which could not be analysed.
@@ -90,7 +91,7 @@ public class PhraseTokenizer {
                     newNuplet.setKeyword(new Keyword(KeyType.STEMMED_ENTITY, tokenValue));
                     newNuplet.setItem(nuplet.getItem());
                     // Produce new nuplet with updated key value.
-                    outputCollector.collect(user, newNuplet);
+                    outputCollector.collect(NullWritable.get(), newNuplet);
                 }
                 tokenStream.end();
             } catch (Exception ex) {
