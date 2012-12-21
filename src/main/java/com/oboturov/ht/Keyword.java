@@ -1,5 +1,9 @@
 package com.oboturov.ht;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
@@ -14,7 +18,8 @@ public class Keyword implements WritableComparable<Keyword>{
     private String type;
     private String value;
 
-    public Keyword(String type, String value) {
+    @JsonCreator
+    public Keyword(final @JsonProperty("type") String type, final @JsonProperty("value") String value) {
         this.type = type;
         this.value = value;
     }
@@ -82,6 +87,11 @@ public class Keyword implements WritableComparable<Keyword>{
 
     @Override
     public String toString() {
-        return "Keyword[type='"+this.type+"', value='"+this.value+"']";
+        final ObjectMapper objectMapper = ObjectMapperInstance.get();
+        try {
+            return objectMapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
     }
 }

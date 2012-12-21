@@ -1,5 +1,7 @@
 package com.oboturov.ht;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
@@ -103,11 +105,11 @@ public class Nuplet implements WritableComparable<Nuplet> {
 
     @Override
     public String toString() {
-        return "Nuplet[\n"+
-                this.user.toString()+"\n"+
-                this.item.toString()+"\n"+
-                "keys='"+this.keyword +"'\n"+
-                "lang='" + this.lang + "'\n"+
-                "]";
+        final ObjectMapper objectMapper = ObjectMapperInstance.get();
+        try {
+            return objectMapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.oboturov.ht;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
@@ -65,6 +67,11 @@ public class User implements WritableComparable<User> {
 
     @Override
     public String toString() {
-        return "User[name='"+this.name+ "']";
+        final ObjectMapper objectMapper = ObjectMapperInstance.get();
+        try {
+            return objectMapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
     }
 }
