@@ -22,12 +22,35 @@ public class URIResolverTest {
         aUser.setName("user");
         final Nuplet aNuplet = new Nuplet();
         aNuplet.setUser(aUser);
-        aNuplet.setItem(new Item(ItemType.URL, "malformed URL"));
+        aNuplet.setItem(new Item(ItemType.URL, "http://:malformed.URL"));
         aNuplet.setKeyword(new Keyword(KeyType.PLAIN_TEXT, "some text"));
 
         mapper.map(aUser, aNuplet, output, null);
 
         verify(output, never()).collect(any(User.class), any(Nuplet.class));
+    }
+
+    @Test public void must_normalize_protocol_to_http_if_missed_test() throws IOException {
+        final OutputCollector<User, Nuplet> output = mock(OutputCollector.class);
+        final URIResolver.Map mapper = new URIResolver.Map();
+
+        final User aUser = new User();
+        aUser.setName("user");
+        final Keyword aKeyword = new Keyword(KeyType.PLAIN_TEXT, "some text");
+
+        final Nuplet aNuplet = new Nuplet();
+        aNuplet.setUser(aUser);
+        aNuplet.setKeyword(aKeyword);
+        aNuplet.setItem(new Item(ItemType.URL, "www.dandelionbubbles.com"));
+
+        mapper.map(aUser, aNuplet, output, null);
+
+        final Nuplet expectedNuplet = new Nuplet();
+        expectedNuplet.setUser(aUser);
+        expectedNuplet.setKeyword(aKeyword);
+        expectedNuplet.setItem(new Item(ItemType.URL, "http://www.dandelionbubbles.com"));
+        verify(output, atLeastOnce()).collect(any(User.class), eq(expectedNuplet));
+        verifyNoMoreInteractions(output);
     }
 
     @Test public void must_discard_all_urls_shortened_by_downed_services_test() throws IOException {
@@ -50,7 +73,7 @@ public class URIResolverTest {
         verifyZeroInteractions(output);
     }
 
-    @Test public void do_not_discard_normal_urls_test() throws IOException {
+    @Test public void does_not_discard_normal_urls_test() throws IOException {
         final OutputCollector<User, Nuplet> output = mock(OutputCollector.class);
         final URIResolver.Map mapper = new URIResolver.Map();
 
