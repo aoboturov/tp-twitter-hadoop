@@ -8,11 +8,20 @@ import java.io.IOException;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
+import static org.testng.Assert.assertFalse;
 
 /**
  * @author aoboturov
  */
 public class URIResolverTest {
+
+    @Test public void must_load_dead_shorteners_list_test() {
+        assertFalse(URIResolver.Map.DEAD_SHORTENERS.keySet().isEmpty(), "Dead shorteners list must not be empty");
+    }
+
+    @Test public void must_load_valid_shorteners_list_test() {
+        assertFalse(URIResolver.Map.VALID_SHORTENERS.keySet().isEmpty(), "Valid shorteners list must not be empty");
+    }
 
     @Test public void must_discard_malformed_urls_test() throws IOException {
         final OutputCollector<User, Nuplet> output = mock(OutputCollector.class);
@@ -63,7 +72,7 @@ public class URIResolverTest {
         aNuplet.setUser(aUser);
         aNuplet.setKeyword(new Keyword(KeyType.PLAIN_TEXT, "some text"));
 
-        for (final String host : URIResolver.Map.DEAD_SERVICES.keySet()) {
+        for (final String host : URIResolver.Map.DEAD_SHORTENERS.keySet()) {
             final String shortenedUrl = String.format("http://%s/something.html", host);
             aNuplet.setItem(new Item(ItemType.URL, shortenedUrl));
             mapper.map(aUser, aNuplet, output, null);
