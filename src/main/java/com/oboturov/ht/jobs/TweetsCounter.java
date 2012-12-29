@@ -2,35 +2,46 @@ package com.oboturov.ht.jobs;
 
 import com.oboturov.ht.Tweet;
 import com.oboturov.ht.etl.TweetsReader;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.mapred.lib.ChainMapper;
 import org.apache.hadoop.mapred.lib.LongSumReducer;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
 
 /**
+ * Class counts the number of tweets contained in source file and produce a single numerical counter value.
+ * Script accepts two parameters:
+ * <ol>
+ *   <li>comma-separated list of input files</li>
+ *   <li>output file name</li>
+ * </ol>
  * @author aoboturov
  */
-public class TweetsCounter {
+public class TweetsCounter extends Configured implements Tool {
 
-    private static final boolean TWEETS_COUNTER_KEY = true;
-
-    private static class CountMeasureMap extends MapReduceBase implements Mapper<LongWritable, Tweet, BooleanWritable, LongWritable> {
+    private static class CountMeasureMap extends MapReduceBase implements Mapper<LongWritable, Tweet, NullWritable, LongWritable> {
         @Override
-        public void map(final LongWritable key, final Tweet tweet, final OutputCollector<BooleanWritable, LongWritable> outputCollector, final Reporter reporter) throws IOException {
-            outputCollector.collect(new BooleanWritable(TWEETS_COUNTER_KEY), new LongWritable(1L));
+        public void map(final LongWritable key, final Tweet tweet, final OutputCollector<NullWritable, LongWritable> outputCollector, final Reporter reporter) throws IOException {
+            outputCollector.collect(NullWritable.get(), new LongWritable(1L));
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        final JobConf conf = new JobConf(TweetsCounter.class);
+    @Override
+    public int run(final String[] args) throws Exception {
+        final Configuration config = getConf();
+
+        final JobConf conf = new JobConf(config, TweetsCounter.class);
         conf.setJobName("tweets-count");
 
-        conf.setOutputKeyClass(BooleanWritable.class);
+        conf.setOutputKeyClass(NullWritable.class);
         conf.setOutputValueClass(LongWritable.class);
 
         conf.setCombinerClass(LongSumReducer.class);
@@ -39,6 +50,8 @@ public class TweetsCounter {
         conf.setInputFormat(TextInputFormat.class);
         conf.setOutputFormat(TextOutputFormat.class);
 
+        FileInputFormat.setInputPaths(conf, args[0]);
+        FileOutputFormat.setOutputPath(conf, new Path(args[1]));
 
         // Extract tweets
         ChainMapper.addMapper(
@@ -57,16 +70,25 @@ public class TweetsCounter {
                 CountMeasureMap.class,
                 LongWritable.class,
                 Tweet.class,
-                BooleanWritable.class,
+                NullWritable.class,
                 LongWritable.class,
                 true,
                 new JobConf(false)
         );
 
-        FileInputFormat.setInputPaths(conf, new Path(args[0]));
-        FileOutputFormat.setOutputPath(conf, new Path(args[1]));
-
         JobClient.runJob(conf);
+
+        return 0;
     }
 
+    public static void main(String[] args) throws Exception {
+        for (String arg: args) {
+            System.out.println(arg);
+        }
+
+        // Let ToolRunner handle generic command-line options
+        int res = ToolRunner.run(new TweetsCounter(), args);
+
+        System.exit(res);
+    }
 }
