@@ -11,6 +11,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.mapred.lib.ChainMapper;
 import org.apache.hadoop.mapred.lib.LongSumReducer;
+import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
@@ -35,8 +36,11 @@ public class TweetsCounter extends Configured implements Tool {
     }
 
     @Override
-    public int run(final String[] args) throws Exception {
-        final Configuration config = getConf();
+    public int run(final String[] scriptArgs) throws Exception {
+        final GenericOptionsParser optionsParser = new GenericOptionsParser(scriptArgs);
+
+        final String[] args = optionsParser.getRemainingArgs();
+        final Configuration config = optionsParser.getConfiguration();
 
         final JobConf conf = new JobConf(config, TweetsCounter.class);
         conf.setJobName("tweets-count");
@@ -82,10 +86,6 @@ public class TweetsCounter extends Configured implements Tool {
     }
 
     public static void main(String[] args) throws Exception {
-        for (String arg: args) {
-            System.out.println(arg);
-        }
-
         // Let ToolRunner handle generic command-line options
         int res = ToolRunner.run(new TweetsCounter(), args);
 
