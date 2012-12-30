@@ -25,7 +25,7 @@ import java.io.IOException;
  * </ol>
  * @author aoboturov
  */
-public class UsersCounter extends Configured implements Tool {
+public class UsersListGenerator extends Configured implements Tool {
 
     private static class UserMap extends MapReduceBase implements Mapper<LongWritable, Tweet, Text, LongWritable> {
         @Override
@@ -42,7 +42,7 @@ public class UsersCounter extends Configured implements Tool {
         final Configuration config = optionsParser.getConfiguration();
 
         // Set up first job reading tweets and mapping them to users.
-        final JobConf conf = new JobConf(config, UsersCounter.class);
+        final JobConf conf = new JobConf(config, UsersListGenerator.class);
         conf.setJobName("user-twitted-cnt-generator");
 
         conf.setOutputKeyClass(Text.class);
@@ -87,7 +87,7 @@ public class UsersCounter extends Configured implements Tool {
 
     public static void main(String[] args) throws Exception {
         // Let ToolRunner handle generic command-line options
-        int res = ToolRunner.run(new UsersCounter(), args);
+        int res = ToolRunner.run(new UsersListGenerator(), args);
 
         System.exit(res);
     }
