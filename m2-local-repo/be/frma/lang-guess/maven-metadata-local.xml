@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>be.frma</groupId>
+  <artifactId>lang-guess</artifactId>
+  <versioning>
+    <versions>
+      <version>0.0.8-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20121205174434</lastUpdated>
+  </versioning>
+</metadata>
