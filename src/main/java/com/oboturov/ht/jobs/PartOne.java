@@ -6,6 +6,7 @@ import com.oboturov.ht.User;
 import com.oboturov.ht.etl.NupletCreator;
 import com.oboturov.ht.etl.PhraseTokenizer;
 import com.oboturov.ht.etl.TweetsReader;
+import com.oboturov.ht.etl.URIResolver;
 import com.oboturov.ht.etl.language_identification.LanguageIdentificationWithLangGuess;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -65,6 +66,17 @@ public class PartOne extends Configured implements Tool {
                 NupletCreator.Map.class,
                 LongWritable.class,
                 Tweet.class,
+                User.class,
+                Nuplet.class,
+                true,
+                new JobConf(false)
+        );
+        // Unshorten URLs.
+        ChainMapper.addMapper(
+                jobConf,
+                URIResolver.Map.class,
+                User.class,
+                Nuplet.class,
                 User.class,
                 Nuplet.class,
                 true,
