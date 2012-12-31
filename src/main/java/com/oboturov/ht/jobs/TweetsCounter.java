@@ -1,7 +1,6 @@
 package com.oboturov.ht.jobs;
 
 import com.oboturov.ht.Tweet;
-import com.oboturov.ht.etl.TweetsReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -58,27 +57,27 @@ public class TweetsCounter extends Configured implements Tool {
         FileOutputFormat.setOutputPath(conf, new Path(args[1]));
 
         // Extract tweets
-        ChainMapper.addMapper(
-                conf,
-                TweetsReader.Map.class,
-                LongWritable.class,
-                Text.class,
-                LongWritable.class,
-                Tweet.class,
-                false,
-                new JobConf(false)
-        );
-        // Map tweets to count measure.
-        ChainMapper.addMapper(
-                conf,
-                CountMeasureMap.class,
-                LongWritable.class,
-                Tweet.class,
-                NullWritable.class,
-                LongWritable.class,
-                true,
-                new JobConf(false)
-        );
+//        ChainMapper.addMapper(
+//                conf,
+//                TweetsReader.Map.class,
+//                LongWritable.class,
+//                Text.class,
+//                LongWritable.class,
+//                Tweet.class,
+//                false,
+//                new JobConf(false)
+//        );
+//        // Map tweets to count measure.
+//        ChainMapper.addMapper(
+//                conf,
+//                CountMeasureMap.class,
+//                LongWritable.class,
+//                Tweet.class,
+//                NullWritable.class,
+//                LongWritable.class,
+//                true,
+//                new JobConf(false)
+//        );
 
         JobClient.runJob(conf);
 

@@ -3,9 +3,6 @@ package com.oboturov.ht.jobs;
 import com.oboturov.ht.Nuplet;
 import com.oboturov.ht.Tweet;
 import com.oboturov.ht.User;
-import com.oboturov.ht.etl.NupletCreator;
-import com.oboturov.ht.etl.TweetsReader;
-import com.oboturov.ht.etl.language_identification.LanguageIdentificationWithLangGuess;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -54,49 +51,49 @@ public class LanguagesCounter extends Configured implements Tool {
         jobConf.setOutputFormat(TextOutputFormat.class);
 
         // Extract tweets
-        ChainMapper.addMapper(
-                jobConf,
-                TweetsReader.Map.class,
-                LongWritable.class,
-                Text.class,
-                LongWritable.class,
-                Tweet.class,
-                false,
-                new JobConf(false)
-        );
-        // Map tweets to user-tweet pair.
-        ChainMapper.addMapper(
-                jobConf,
-                NupletCreator.Map.class,
-                LongWritable.class,
-                Tweet.class,
-                User.class,
-                Nuplet.class,
-                true,
-                new JobConf(false)
-        );
-        // Detect tweets language
-        ChainMapper.addMapper(
-                jobConf,
-                LanguageIdentificationWithLangGuess.LanguageIdentificationMap.class,
-                User.class,
-                Nuplet.class,
-                User.class,
-                Nuplet.class,
-                true,
-                new JobConf(false)
-        );
-        // Project onto language
-        ChainMapper.addMapper(
-                jobConf,
-                LanguageProjectionMap.class,
-                User.class,
-                Nuplet.class,
-                Text.class,
-                LongWritable.class,
-                true,
-                new JobConf(false)
-        );
+//        ChainMapper.addMapper(
+//                jobConf,
+//                TweetsReader.Map.class,
+//                LongWritable.class,
+//                Text.class,
+//                LongWritable.class,
+//                Tweet.class,
+//                false,
+//                new JobConf(false)
+//        );
+//        // Map tweets to user-tweet pair.
+//        ChainMapper.addMapper(
+//                jobConf,
+//                NupletCreator.Map.class,
+//                LongWritable.class,
+//                Tweet.class,
+//                User.class,
+//                Nuplet.class,
+//                true,
+//                new JobConf(false)
+//        );
+//        // Detect tweets language
+//        ChainMapper.addMapper(
+//                jobConf,
+//                LanguageIdentificationWithLangGuess.LanguageIdentificationMap.class,
+//                User.class,
+//                Nuplet.class,
+//                User.class,
+//                Nuplet.class,
+//                true,
+//                new JobConf(false)
+//        );
+//        // Project onto language
+//        ChainMapper.addMapper(
+//                jobConf,
+//                LanguageProjectionMap.class,
+//                User.class,
+//                Nuplet.class,
+//                Text.class,
+//                LongWritable.class,
+//                true,
+//                new JobConf(false)
+//        );
 
         FileInputFormat.setInputPaths(jobConf, new Path(args[args.length - 2]));
         FileOutputFormat.setOutputPath(jobConf, new Path(args[args.length - 1]));

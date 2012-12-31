@@ -1,7 +1,7 @@
-package com.oboturov.ht.etl;
+package com.oboturov.ht.stage0;
 
 import com.oboturov.ht.Tweet;
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.testng.annotations.Test;
@@ -19,7 +19,7 @@ public class TweetsReaderTest {
     @Test
     public void reads_valid_tweet_data() throws Exception {
         final LineNumberReader lineReader = new LineNumberReader(new FileReader("src/test/data/com/oboturov/ht/etl/valid-tweets-sample-file.txt"));
-        final OutputCollector<LongWritable, Tweet> output = mock(OutputCollector.class);
+        final OutputCollector<NullWritable, Tweet> output = mock(OutputCollector.class);
         final TweetsReader.Map mapper = new TweetsReader.Map();
 
         String nextLine = lineReader.readLine();
@@ -31,7 +31,7 @@ public class TweetsReaderTest {
         final long tOne = 1244333261000L,
                    tTwo = 1244333262000L;
         verify(output, atLeastOnce()).collect(
-                eq(new LongWritable(tOne)),
+                isA(NullWritable.class),
                 eq(new Tweet(
                         "@hokiepokie728",
                         tOne,
@@ -39,7 +39,7 @@ public class TweetsReaderTest {
                 ))
         );
         verify(output, atLeastOnce()).collect(
-                eq(new LongWritable(tTwo)),
+                isA(NullWritable.class),
                 eq(new Tweet(
                         "@annieng",
                         tTwo,
@@ -47,7 +47,7 @@ public class TweetsReaderTest {
                 ))
         );
         verify(output, atLeastOnce()).collect(
-                eq(new LongWritable(tTwo)),
+                isA(NullWritable.class),
                 eq(new Tweet(
                         "@caitlinhllywd",
                         tTwo,
@@ -55,7 +55,7 @@ public class TweetsReaderTest {
                 ))
         );
         verify(output, atLeastOnce()).collect(
-                eq(new LongWritable(tTwo)),
+                isA(NullWritable.class),
                 eq(new Tweet(
                         "@deaconsnacks",
                         tTwo,
@@ -63,7 +63,7 @@ public class TweetsReaderTest {
                 ))
         );
         verify(output, atLeastOnce()).collect(
-                eq(new LongWritable(tTwo)),
+                isA(NullWritable.class),
                 eq(new Tweet(
                         "@gadgetsguru",
                         tTwo,
@@ -71,7 +71,7 @@ public class TweetsReaderTest {
                 ))
         );
         verify(output, atLeastOnce()).collect(
-                eq(new LongWritable(tTwo)),
+                isA(NullWritable.class),
                 eq(new Tweet(
                         "@holland_hotels",
                         tTwo,

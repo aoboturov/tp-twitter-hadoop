@@ -1,6 +1,7 @@
 package com.oboturov.ht.etl;
 
 import com.oboturov.ht.*;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.testng.annotations.Test;
 
@@ -14,7 +15,7 @@ public class NupletCreatorTest {
 
     @Test
     public void reads_valid_tweet_data() throws Exception {
-        final OutputCollector<User, Nuplet> output = mock(OutputCollector.class);
+        final OutputCollector<NullWritable, Nuplet> output = mock(OutputCollector.class);
         final NupletCreator.Map mapper = new NupletCreator.Map();
 
         mapper.map(
@@ -44,7 +45,7 @@ public class NupletCreatorTest {
         aNuplet.setKeyword(new Keyword(KeyType.PLAIN_TEXT, " Cheer up Liz:)"));
 
         verify(output, atLeastOnce()).collect(
-                eq(deaconsnacks),
+                any(NullWritable.class),
                 eq(aNuplet)
         );
 
@@ -56,12 +57,12 @@ public class NupletCreatorTest {
         bNuplet.setKeyword(new Keyword(KeyType.PLAIN_TEXT, "Eden Amsterdam American Hotel (****) on various dates for €110 .. "));
 
         verify(output, atLeastOnce()).collect(
-                eq(holland_hotels),
+                any(NullWritable.class),
                 eq(bNuplet)
         );
 
         // Do not process text only tweets.
-        verify(output, atMost(2)).collect(any(User.class), any(Nuplet.class));
+        verify(output, atMost(2)).collect(any(NullWritable.class), any(Nuplet.class));
     }
 
 }

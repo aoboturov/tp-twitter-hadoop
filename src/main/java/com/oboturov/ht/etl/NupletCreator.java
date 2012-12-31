@@ -3,6 +3,7 @@ package com.oboturov.ht.etl;
 import com.oboturov.ht.*;
 import com.twitter.Extractor;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class NupletCreator {
 
-    public static class Map extends MapReduceBase implements Mapper<LongWritable, Tweet, User, Nuplet> {
+    public static class Map extends MapReduceBase implements Mapper<LongWritable, Tweet, NullWritable, Nuplet> {
 
         private final static Logger logger = Logger.getLogger(Map.class);
 
@@ -35,7 +36,7 @@ public class NupletCreator {
         }
 
         @Override
-        public void map(final LongWritable key, final Tweet tweet, final OutputCollector<User, Nuplet> output, final Reporter reporter) throws IOException {
+        public void map(final LongWritable key, final Tweet tweet, final OutputCollector<NullWritable, Nuplet> output, final Reporter reporter) throws IOException {
             String text = tweet.getPost();
             // Handle hashes.
             final List<Extractor.Entity> entities = extractor.extractEntitiesWithIndices(text);
@@ -66,7 +67,7 @@ public class NupletCreator {
                 nuplet.setUser(user);
                 nuplet.setKeyword(new Keyword(KeyType.PLAIN_TEXT, rawText));
                 nuplet.setItem(item);
-                output.collect(user, nuplet);
+                output.collect(NullWritable.get(), nuplet);
             }
         }
     }

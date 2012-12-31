@@ -1,6 +1,8 @@
 package com.oboturov.ht;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
@@ -15,6 +17,8 @@ public class Tweet implements WritableComparable<Tweet> {
     private User user;
     private Long time;
     private String post;
+
+    public Tweet() {}
 
     public Tweet(final String user, final Long time, final String post) {
         this.user = new User();
@@ -75,5 +79,15 @@ public class Tweet implements WritableComparable<Tweet> {
             return 0;
         }
         return this.time > rhs.time ? 1 : -1;
+    }
+
+    @Override
+    public String toString() {
+        final ObjectMapper objectMapper = ObjectMapperInstance.get();
+        try {
+            return objectMapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
     }
 }

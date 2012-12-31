@@ -1,7 +1,6 @@
 package com.oboturov.ht.jobs;
 
 import com.oboturov.ht.Tweet;
-import com.oboturov.ht.etl.TweetsReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -48,7 +47,7 @@ public class UsersListGenerator extends Configured implements Tool {
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(LongWritable.class);
 
-        conf.setMapperClass(TweetsReader.Map.class);
+//        conf.setMapperClass(TweetsReader.Map.class);
         conf.setReducerClass(LongSumReducer.class);
 
         conf.setInputFormat(TextInputFormat.class);
@@ -58,16 +57,16 @@ public class UsersListGenerator extends Configured implements Tool {
         FileOutputFormat.setOutputPath(conf, new Path(args[1]));
 
         // Extract tweets
-        ChainMapper.addMapper(
-                conf,
-                TweetsReader.Map.class,
-                LongWritable.class,
-                Text.class,
-                LongWritable.class,
-                Tweet.class,
-                false,
-                new JobConf(false)
-        );
+//        ChainMapper.addMapper(
+//                conf,
+//                TweetsReader.Map.class,
+//                LongWritable.class,
+//                Text.class,
+//                LongWritable.class,
+//                Tweet.class,
+//                false,
+//                new JobConf(false)
+//        );
         // Map tweets to users who produced them.
         ChainMapper.addMapper(
                 conf,
