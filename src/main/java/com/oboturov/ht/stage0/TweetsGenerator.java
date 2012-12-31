@@ -41,6 +41,7 @@ public class TweetsGenerator extends Configured implements Tool {
 
         conf.setInt("mapreduce.input.lineinputformat.linespermap", 4*10000);
         conf.setBoolean(org.apache.hadoop.mapreduce.lib.output.FileOutputFormat.COMPRESS, true);
+        conf.set("mapred.output.compression.codec", "org.apache.hadoop.io.compress.BZip2Codec");
 
         conf.setInputFormat(NLineInputFormat.class);
         conf.setOutputFormat(TextOutputFormat.class);
