@@ -21,6 +21,10 @@ public class TweetsReader {
 
     public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, NullWritable, Tweet> {
 
+        enum RawTweets {
+            ILLEGAL_DATE, NON_NORMALIZABLE_USER_NAME
+        }
+
         private static final String HTTP_TWITTER_COM = "http://twitter.com/";
         private static final String HTTP_WWW_TWITTER_COM = "http://www.twitter.com/";
         private static final String EMPTY_POST_INDICATION = "No Post Title";
@@ -55,7 +59,9 @@ public class TweetsReader {
                         this.time = dateFormat.parse(text).getTime();
                     } catch (final ParseException e) {
                         skipTweet = true;
-                        logger.error("Wrong date format for date: '"+text+"'");
+                        logger.error(String.format("At %d, Wrong date format for date: '%s'", key.get(), text));
+                        reporter.setStatus("Detected illegal date");
+                        reporter.incrCounter(RawTweets.ILLEGAL_DATE, 1l);
                     }
                     return;
                 case 'U':
@@ -65,7 +71,9 @@ public class TweetsReader {
                         this.user = "@"+text.substring(HTTP_WWW_TWITTER_COM.length());
                     } else {
                         this.user = text;
-                        logger.error("Not normalized user name: '"+text+"'");
+                        logger.error(String.format("At %d, Not normalized user name: '%s'", key.get(), text));
+                        reporter.setStatus("Detected non-normalizable user name");
+                        reporter.incrCounter(RawTweets.NON_NORMALIZABLE_USER_NAME, 1l);
                     }
                     return;
                 case 'W':

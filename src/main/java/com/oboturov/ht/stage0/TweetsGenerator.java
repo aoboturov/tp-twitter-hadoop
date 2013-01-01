@@ -2,7 +2,6 @@ package com.oboturov.ht.stage0;
 
 import com.oboturov.ht.ConfigUtils;
 import com.oboturov.ht.Tweet;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
@@ -12,7 +11,6 @@ import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.mapred.lib.ChainMapper;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.hadoop.mapred.lib.NLineInputFormat;
-import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
@@ -29,13 +27,8 @@ import org.apache.hadoop.util.ToolRunner;
 public class TweetsGenerator extends Configured implements Tool {
 
     @Override
-    public int run(final String[] scriptArgs) throws Exception {
-        final GenericOptionsParser optionsParser = new GenericOptionsParser(scriptArgs);
-
-        final String[] args = optionsParser.getRemainingArgs();
-        final Configuration config = optionsParser.getConfiguration();
-
-        final JobConf conf = new JobConf(config, TweetsGenerator.class);
+    public int run(final String[] args) throws Exception {
+        final JobConf conf = new JobConf(getConf(), getClass());
         conf.setJobName("tweets-generator");
 
         conf.setReducerClass(IdentityReducer.class);
