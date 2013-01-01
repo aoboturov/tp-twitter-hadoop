@@ -1,10 +1,11 @@
-package com.oboturov.ht.jobs;
+package com.oboturov.ht.stage1;
 
 import com.oboturov.ht.Tweet;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.mapred.lib.ChainMapper;
@@ -16,7 +17,7 @@ import org.apache.hadoop.util.ToolRunner;
 import java.io.IOException;
 
 /**
- * Class produces Key-Value ordered by Key map of twitter user names with a number of tweets issued by user.
+ * Class counts the number of tweets contained in source file and produce a single numerical counter value.
  * Script accepts two parameters:
  * <ol>
  *   <li>comma-separated list of input files</li>
@@ -24,12 +25,12 @@ import java.io.IOException;
  * </ol>
  * @author aoboturov
  */
-public class UsersListGenerator extends Configured implements Tool {
+public class TweetsCounter extends Configured implements Tool {
 
-    private static class UserMap extends MapReduceBase implements Mapper<LongWritable, Tweet, Text, LongWritable> {
+    private static class CountMeasureMap extends MapReduceBase implements Mapper<NullWritable, Tweet, NullWritable, LongWritable> {
         @Override
-        public void map(final LongWritable key, final Tweet tweet, final OutputCollector< Text, LongWritable> output, final Reporter reporter) throws IOException {
-            output.collect(new Text(tweet.getUser().getName()),  new LongWritable(1L));
+        public void map(final NullWritable key, final Tweet tweet, final OutputCollector<NullWritable, LongWritable> outputCollector, final Reporter reporter) throws IOException {
+            outputCollector.collect(NullWritable.get(), new LongWritable(1L));
         }
     }
 
@@ -40,14 +41,13 @@ public class UsersListGenerator extends Configured implements Tool {
         final String[] args = optionsParser.getRemainingArgs();
         final Configuration config = optionsParser.getConfiguration();
 
-        // Set up first job reading tweets and mapping them to users.
-        final JobConf conf = new JobConf(config, UsersListGenerator.class);
-        conf.setJobName("user-twitted-cnt-generator");
+        final JobConf conf = new JobConf(config, TweetsCounter.class);
+        conf.setJobName("tweets-count");
 
-        conf.setOutputKeyClass(Text.class);
+        conf.setOutputKeyClass(NullWritable.class);
         conf.setOutputValueClass(LongWritable.class);
 
-//        conf.setMapperClass(TweetsReader.Map.class);
+        conf.setCombinerClass(LongSumReducer.class);
         conf.setReducerClass(LongSumReducer.class);
 
         conf.setInputFormat(TextInputFormat.class);
@@ -57,23 +57,23 @@ public class UsersListGenerator extends Configured implements Tool {
         FileOutputFormat.setOutputPath(conf, new Path(args[1]));
 
         // Extract tweets
-//        ChainMapper.addMapper(
-//                conf,
-//                TweetsReader.Map.class,
-//                LongWritable.class,
-//                Text.class,
-//                LongWritable.class,
-//                Tweet.class,
-//                false,
-//                new JobConf(false)
-//        );
-        // Map tweets to users who produced them.
         ChainMapper.addMapper(
                 conf,
-                UserMap.class,
+                GeneratedTweetsReader.Map.class,
                 LongWritable.class,
-                Tweet.class,
                 Text.class,
+                NullWritable.class,
+                Tweet.class,
+                false,
+                new JobConf(false)
+        );
+        // Map tweets to count measure.
+        ChainMapper.addMapper(
+                conf,
+                CountMeasureMap.class,
+                NullWritable.class,
+                Tweet.class,
+                NullWritable.class,
                 LongWritable.class,
                 true,
                 new JobConf(false)
@@ -86,7 +86,7 @@ public class UsersListGenerator extends Configured implements Tool {
 
     public static void main(String[] args) throws Exception {
         // Let ToolRunner handle generic command-line options
-        int res = ToolRunner.run(new UsersListGenerator(), args);
+        int res = ToolRunner.run(new TweetsCounter(), args);
 
         System.exit(res);
     }

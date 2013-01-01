@@ -1,4 +1,4 @@
-package com.oboturov.ht.jobs;
+package com.oboturov.ht.stage1;
 
 import com.oboturov.ht.Tweet;
 import org.apache.hadoop.conf.Configuration;
@@ -17,7 +17,7 @@ import org.apache.hadoop.util.ToolRunner;
 import java.io.IOException;
 
 /**
- * Class counts the number of tweets contained in source file and produce a single numerical counter value.
+ * Class produces Key-Value ordered by Key map of twitter user names with a number of tweets issued by user.
  * Script accepts two parameters:
  * <ol>
  *   <li>comma-separated list of input files</li>
@@ -25,12 +25,12 @@ import java.io.IOException;
  * </ol>
  * @author aoboturov
  */
-public class TweetsCounter extends Configured implements Tool {
+public class UsersListGenerator extends Configured implements Tool {
 
-    private static class CountMeasureMap extends MapReduceBase implements Mapper<LongWritable, Tweet, NullWritable, LongWritable> {
+    private static class UserMap extends MapReduceBase implements Mapper<NullWritable, Tweet, Text, LongWritable> {
         @Override
-        public void map(final LongWritable key, final Tweet tweet, final OutputCollector<NullWritable, LongWritable> outputCollector, final Reporter reporter) throws IOException {
-            outputCollector.collect(NullWritable.get(), new LongWritable(1L));
+        public void map(final NullWritable key, final Tweet tweet, final OutputCollector<Text, LongWritable> output, final Reporter reporter) throws IOException {
+            output.collect(new Text(tweet.getUser().getName()), new LongWritable(1L));
         }
     }
 
@@ -41,13 +41,13 @@ public class TweetsCounter extends Configured implements Tool {
         final String[] args = optionsParser.getRemainingArgs();
         final Configuration config = optionsParser.getConfiguration();
 
-        final JobConf conf = new JobConf(config, TweetsCounter.class);
-        conf.setJobName("tweets-count");
+        // Set up first job reading tweets and mapping them to users.
+        final JobConf conf = new JobConf(config, UsersListGenerator.class);
+        conf.setJobName("users-list-generator");
 
-        conf.setOutputKeyClass(NullWritable.class);
+        conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(LongWritable.class);
 
-        conf.setCombinerClass(LongSumReducer.class);
         conf.setReducerClass(LongSumReducer.class);
 
         conf.setInputFormat(TextInputFormat.class);
@@ -57,27 +57,27 @@ public class TweetsCounter extends Configured implements Tool {
         FileOutputFormat.setOutputPath(conf, new Path(args[1]));
 
         // Extract tweets
-//        ChainMapper.addMapper(
-//                conf,
-//                TweetsReader.Map.class,
-//                LongWritable.class,
-//                Text.class,
-//                LongWritable.class,
-//                Tweet.class,
-//                false,
-//                new JobConf(false)
-//        );
-//        // Map tweets to count measure.
-//        ChainMapper.addMapper(
-//                conf,
-//                CountMeasureMap.class,
-//                LongWritable.class,
-//                Tweet.class,
-//                NullWritable.class,
-//                LongWritable.class,
-//                true,
-//                new JobConf(false)
-//        );
+        ChainMapper.addMapper(
+                conf,
+                GeneratedTweetsReader.Map.class,
+                LongWritable.class,
+                Text.class,
+                NullWritable.class,
+                Tweet.class,
+                false,
+                new JobConf(false)
+        );
+        // Map tweets to users who produced them and a counter of tweets per user.
+        ChainMapper.addMapper(
+                conf,
+                UserMap.class,
+                NullWritable.class,
+                Tweet.class,
+                Text.class,
+                LongWritable.class,
+                true,
+                new JobConf(false)
+        );
 
         JobClient.runJob(conf);
 
@@ -86,7 +86,7 @@ public class TweetsCounter extends Configured implements Tool {
 
     public static void main(String[] args) throws Exception {
         // Let ToolRunner handle generic command-line options
-        int res = ToolRunner.run(new TweetsCounter(), args);
+        int res = ToolRunner.run(new UsersListGenerator(), args);
 
         System.exit(res);
     }
