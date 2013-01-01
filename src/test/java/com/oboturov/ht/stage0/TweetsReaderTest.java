@@ -75,7 +75,7 @@ public class TweetsReaderTest {
                 eq(new Tweet(
                         "@holland_hotels",
                         tTwo,
-                        "Eden Amsterdam American Hotel (****) on various dates for €110 .. http://bit.ly/mbGoR"
+                        "Eden Amsterdam American Hotel (****) on various dates for 110 .. http://bit.ly/mbGoR"
                 ))
         );
     }
