@@ -1,5 +1,6 @@
 package com.oboturov.ht.stage1;
 
+import com.oboturov.ht.ConfigUtils;
 import com.oboturov.ht.Tweet;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -52,6 +53,7 @@ public class UsersListGenerator extends Configured implements Tool {
 
         conf.setInputFormat(TextInputFormat.class);
         conf.setOutputFormat(TextOutputFormat.class);
+        ConfigUtils.makeMapOutputCompressedWithBZip2(conf);
 
         FileInputFormat.setInputPaths(conf, args[0]);
         FileOutputFormat.setOutputPath(conf, new Path(args[1]));

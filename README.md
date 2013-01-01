@@ -38,3 +38,11 @@ Now input files could be handled within Hadoop framework without having too much
 
 One have to execute the `com.oboturov.ht.stage0.TweetsGenerator` Hadoop Script which will generate a file with
 Tweets on each line.
+
+## Stage-1 Generated Tweets Data processing
+
+The `com.oboturov.ht.stage1.TweetsCounter` Script will output a single number which is the number of Tweets contained in
+provided file.
+
+Anoter Script called `com.oboturov.ht.stage1.UsersListGenerator` will generate K-V pair for User name and an amount of
+Tweets he produced during the period.

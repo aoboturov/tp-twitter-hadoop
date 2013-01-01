@@ -1,5 +1,6 @@
 package com.oboturov.ht.stage0;
 
+import com.oboturov.ht.ConfigUtils;
 import com.oboturov.ht.Tweet;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -39,9 +40,8 @@ public class TweetsGenerator extends Configured implements Tool {
 
         conf.setReducerClass(IdentityReducer.class);
 
-        conf.setInt("mapreduce.input.lineinputformat.linespermap", 4*10000);
-        conf.setBoolean(org.apache.hadoop.mapreduce.lib.output.FileOutputFormat.COMPRESS, true);
-        conf.set("mapred.output.compression.codec", "org.apache.hadoop.io.compress.BZip2Codec");
+        conf.setInt("mapreduce.input.lineinputformat.linespermap", 4 * 10000);
+        ConfigUtils.makeMapOutputCompressedWithBZip2(conf);
 
         conf.setInputFormat(NLineInputFormat.class);
         conf.setOutputFormat(TextOutputFormat.class);
