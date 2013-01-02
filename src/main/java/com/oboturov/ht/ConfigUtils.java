@@ -9,7 +9,7 @@ public final class ConfigUtils {
 
     public static JobConf makeMapOutputCompressedWithBZip2(final JobConf conf) {
         conf.setBoolean("mapreduce.output.fileoutputformat.compress", true);
-        conf.set("mapreduce.output.fileoutputformat.compression.codec", "org.apache.hadoop.io.compress.BZip2Codec");
+        conf.set("mapreduce.output.fileoutputformat.compress.codec", "org.apache.hadoop.io.compress.BZip2Codec");
         return conf;
     }
 }
