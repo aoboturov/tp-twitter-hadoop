@@ -1,9 +1,11 @@
-package com.oboturov.ht.etl.language_identification;
+package com.oboturov.ht.stage2;
 
 import com.cybozu.labs.langdetect.DetectorFactory;
 import com.cybozu.labs.langdetect.LangDetectException;
 import com.oboturov.ht.*;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reporter;
 import org.mockito.ArgumentMatcher;
 import org.testng.annotations.Test;
 
@@ -27,8 +29,8 @@ public class LanguageIdentificationWithLangGuessTest {
                 new LanguageIdentificationWithLangGuess.LanguageIdentificationMap();
         DetectorFactory.setSeed(0L);
 
-        final OutputCollector<User, Nuplet> output = mock(OutputCollector.class);
-
+        final OutputCollector<NullWritable, Nuplet> output = mock(OutputCollector.class);
+        final Reporter reporter = mock(Reporter.class);
 
         final User anUser = new User();
         anUser.setName("anuser");
@@ -38,36 +40,36 @@ public class LanguageIdentificationWithLangGuessTest {
         englishTextNuplet.setItem(new Item(ItemType.AT, "otheruser"));
         englishTextNuplet.setKeyword(new Keyword(KeyType.RAW_TEXT, "Bus is pulling out now. We gotta be in LA by 8 to check into the Paragon."));
         mapper.map(
-                anUser,
+                NullWritable.get(),
                 englishTextNuplet,
                 output,
-                null
+                reporter
         );
-        verify(output, atLeastOnce()).collect(eq(anUser), argThat(new IdentifiedLanguageMatcher("en")));
+        verify(output, atLeastOnce()).collect(isA(NullWritable.class), argThat(new IdentifiedLanguageMatcher("en")));
 
         final Nuplet japaneseTextNuplet = new Nuplet();
         japaneseTextNuplet.setUser(anUser);
         japaneseTextNuplet.setItem(new Item(ItemType.AT, "otheruser"));
         japaneseTextNuplet.setKeyword(new Keyword(KeyType.RAW_TEXT, "灰を灰皿に落とそうとすると高確率でヘッドセットの線を根性焼きする形になるんだが"));
         mapper.map(
-                anUser,
+                NullWritable.get(),
                 japaneseTextNuplet,
                 output,
-                null
+                reporter
         );
-        verify(output, atLeastOnce()).collect(eq(anUser), argThat(new IdentifiedLanguageMatcher("ja")));
+        verify(output, atLeastOnce()).collect(isA(NullWritable.class), argThat(new IdentifiedLanguageMatcher("ja")));
 
         final Nuplet russianTextNuplet = new Nuplet();
         russianTextNuplet.setUser(anUser);
         russianTextNuplet.setItem(new Item(ItemType.AT, "otheruser"));
         russianTextNuplet.setKeyword(new Keyword(KeyType.RAW_TEXT, "Абсолютно точно, что эта фраза написана на русском языке"));
         mapper.map(
-                anUser,
+                NullWritable.get(),
                 russianTextNuplet,
                 output,
-                null
+                reporter
         );
-        verify(output, atLeastOnce()).collect(eq(anUser), argThat(new IdentifiedLanguageMatcher("ru")));
+        verify(output, atLeastOnce()).collect(isA(NullWritable.class), argThat(new IdentifiedLanguageMatcher("ru")));
     }
 
     class IdentifiedLanguageMatcher extends ArgumentMatcher<Nuplet> {
