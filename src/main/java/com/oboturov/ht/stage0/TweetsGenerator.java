@@ -33,7 +33,7 @@ public class TweetsGenerator extends Configured implements Tool {
 
         conf.setReducerClass(IdentityReducer.class);
 
-        conf.setInt("mapreduce.input.lineinputformat.linespermap", 4 * 10000);
+        conf.setInt("mapreduce.input.lineinputformat.linespermap", 4 * 1_000_000);
         ConfigUtils.makeMapOutputCompressedWithBZip2(conf);
 
         conf.setInputFormat(NLineInputFormat.class);

@@ -21,7 +21,7 @@ public class TweetsReader {
 
     public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, NullWritable, Tweet> {
 
-        enum RawTweets {
+        enum Counters {
             ILLEGAL_DATE, NON_NORMALIZABLE_USER_NAME
         }
 
@@ -29,13 +29,18 @@ public class TweetsReader {
         private static final String HTTP_WWW_TWITTER_COM = "http://www.twitter.com/";
         private static final String EMPTY_POST_INDICATION = "No Post Title";
 
-        private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        private static ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
+            @Override
+            protected synchronized DateFormat initialValue() {
+                return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            }
+        };
 
-        private Long time;
-        private String user;
-        private String post;
+        private transient Long time;
+        private transient String user;
+        private transient String post;
 
-        private boolean skipTweet = false;
+        private transient boolean skipTweet = false;
 
         private void reset() {
             time = null;
@@ -56,12 +61,12 @@ public class TweetsReader {
             switch (lineType) {
                 case 'T':
                     try {
-                        this.time = dateFormat.parse(text).getTime();
+                        this.time = dateFormat.get().parse(text).getTime();
                     } catch (final ParseException e) {
                         skipTweet = true;
                         logger.error(String.format("At %d, Wrong date format for date: '%s'", key.get(), text));
                         reporter.setStatus("Detected illegal date");
-                        reporter.incrCounter(RawTweets.ILLEGAL_DATE, 1l);
+                        reporter.incrCounter(Counters.ILLEGAL_DATE, 1l);
                     }
                     return;
                 case 'U':
@@ -73,7 +78,7 @@ public class TweetsReader {
                         this.user = text;
                         logger.error(String.format("At %d, Not normalized user name: '%s'", key.get(), text));
                         reporter.setStatus("Detected non-normalizable user name");
-                        reporter.incrCounter(RawTweets.NON_NORMALIZABLE_USER_NAME, 1l);
+                        reporter.incrCounter(Counters.NON_NORMALIZABLE_USER_NAME, 1l);
                     }
                     return;
                 case 'W':
