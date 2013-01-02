@@ -29,9 +29,13 @@ import java.io.IOException;
 public class UsersListGenerator extends Configured implements Tool {
 
     private static class UserMap extends MapReduceBase implements Mapper<NullWritable, Tweet, Text, LongWritable> {
+        private final LongWritable one = new LongWritable(1L);
+        private final Text userName = new Text();
+
         @Override
         public void map(final NullWritable key, final Tweet tweet, final OutputCollector<Text, LongWritable> output, final Reporter reporter) throws IOException {
-            output.collect(new Text(tweet.getUser().getName()), new LongWritable(1L));
+            userName.set(tweet.getUser().getName());
+            output.collect(userName, one);
         }
     }
 
@@ -48,8 +52,6 @@ public class UsersListGenerator extends Configured implements Tool {
 
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(LongWritable.class);
-
-        conf.setReducerClass(LongSumReducer.class);
 
         conf.setInputFormat(TextInputFormat.class);
         conf.setOutputFormat(TextOutputFormat.class);
@@ -70,6 +72,8 @@ public class UsersListGenerator extends Configured implements Tool {
                 new JobConf(false)
         );
         // Map tweets to users who produced them and a counter of tweets per user.
+        final JobConf userMapConf = new JobConf(false);
+        userMapConf.setReducerClass(LongSumReducer.class);
         ChainMapper.addMapper(
                 conf,
                 UserMap.class,
@@ -78,7 +82,7 @@ public class UsersListGenerator extends Configured implements Tool {
                 Text.class,
                 LongWritable.class,
                 true,
-                new JobConf(false)
+                userMapConf
         );
 
         JobClient.runJob(conf);

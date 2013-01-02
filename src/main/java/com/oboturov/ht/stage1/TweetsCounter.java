@@ -28,9 +28,11 @@ import java.io.IOException;
 public class TweetsCounter extends Configured implements Tool {
 
     private static class CountMeasureMap extends MapReduceBase implements Mapper<NullWritable, Tweet, NullWritable, LongWritable> {
+        private final LongWritable one = new LongWritable(1L);
+
         @Override
         public void map(final NullWritable key, final Tweet tweet, final OutputCollector<NullWritable, LongWritable> outputCollector, final Reporter reporter) throws IOException {
-            outputCollector.collect(NullWritable.get(), new LongWritable(1L));
+            outputCollector.collect(NullWritable.get(), one);
         }
     }
 
