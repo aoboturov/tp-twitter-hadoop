@@ -37,14 +37,11 @@ public class TweetsCounter extends Configured implements Tool {
     }
 
     @Override
-    public int run(final String[] scriptArgs) throws Exception {
-        final GenericOptionsParser optionsParser = new GenericOptionsParser(scriptArgs);
-
-        final String[] args = optionsParser.getRemainingArgs();
-        final Configuration config = optionsParser.getConfiguration();
-
-        final JobConf conf = new JobConf(config, TweetsCounter.class);
+    public int run(final String[] args) throws Exception {
+        final JobConf conf = new JobConf(getConf(), getClass());
         conf.setJobName("tweets-count");
+
+        conf.setNumMapTasks(10);
 
         conf.setOutputKeyClass(NullWritable.class);
         conf.setOutputValueClass(LongWritable.class);

@@ -1,5 +1,6 @@
 package com.oboturov.ht.stage1;
 
+import com.oboturov.ht.ConfigUtils;
 import com.oboturov.ht.Nuplet;
 import com.oboturov.ht.Tweet;
 import org.apache.hadoop.conf.Configured;
@@ -29,11 +30,15 @@ public class NupletsGenerator extends Configured implements Tool {
 
         jobConf.setJobName("nuplets-generator");
 
+        jobConf.setNumReduceTasks(0);
+        jobConf.setNumMapTasks(10);
+
         jobConf.setOutputKeyClass(NullWritable.class);
         jobConf.setOutputValueClass(Nuplet.class);
 
         jobConf.setInputFormat(TextInputFormat.class);
         jobConf.setOutputFormat(TextOutputFormat.class);
+        ConfigUtils.makeMapOutputCompressedWithBZip2(jobConf);
 
         FileInputFormat.setInputPaths(jobConf, args[0]);
         FileOutputFormat.setOutputPath(jobConf, new Path(args[1]));

@@ -31,7 +31,8 @@ public class TweetsGenerator extends Configured implements Tool {
         final JobConf conf = new JobConf(getConf(), getClass());
         conf.setJobName("tweets-generator");
 
-        conf.setReducerClass(IdentityReducer.class);
+        conf.setNumReduceTasks(0);
+        conf.setNumMapTasks(10);
 
         conf.setInt("mapreduce.input.lineinputformat.linespermap", 4 * 1_000_000);
         ConfigUtils.makeMapOutputCompressedWithBZip2(conf);

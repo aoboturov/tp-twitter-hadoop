@@ -40,14 +40,9 @@ public class UsersListGenerator extends Configured implements Tool {
     }
 
     @Override
-    public int run(final String[] scriptArgs) throws Exception {
-        final GenericOptionsParser optionsParser = new GenericOptionsParser(scriptArgs);
-
-        final String[] args = optionsParser.getRemainingArgs();
-        final Configuration config = optionsParser.getConfiguration();
-
+    public int run(final String[] args) throws Exception {
         // Set up first job reading tweets and mapping them to users.
-        final JobConf conf = new JobConf(config, UsersListGenerator.class);
+        final JobConf conf = new JobConf(getConf(), getClass());
         conf.setJobName("users-list-generator");
 
         conf.setOutputKeyClass(Text.class);
