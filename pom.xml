@@ -140,16 +140,6 @@
             <version>1.5.0</version>
         </dependency>
         <dependency>
-            <groupId>edu.stanford.nlp</groupId>
-            <artifactId>stanford-ner</artifactId>
-            <version>1.2.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
             <groupId>be.frma</groupId>
             <artifactId>lang-guess</artifactId>
             <version>0.0.8-SNAPSHOT</version>
