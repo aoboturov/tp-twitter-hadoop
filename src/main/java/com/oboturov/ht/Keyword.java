@@ -13,7 +13,9 @@ import java.io.IOException;
 /**
  * @author aoboturov
  */
-public class Keyword implements WritableComparable<Keyword>{
+public class Keyword implements WritableComparable<Keyword> {
+
+    public static final Keyword NO_KEYWORD = new Keyword(KeyType.NULL, "");
 
     private String type;
     private String value;

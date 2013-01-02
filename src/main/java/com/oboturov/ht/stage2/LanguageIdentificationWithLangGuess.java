@@ -5,6 +5,7 @@ import com.cybozu.labs.langdetect.DetectorFactory;
 import com.cybozu.labs.langdetect.ErrorCode;
 import com.cybozu.labs.langdetect.LangDetectException;
 import com.oboturov.ht.KeyType;
+import com.oboturov.ht.Keyword;
 import com.oboturov.ht.Nuplet;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.MapReduceBase;
@@ -42,7 +43,7 @@ public class LanguageIdentificationWithLangGuess {
                 // OK if during testing it loads duplicates.
                 if (!ErrorCode.DuplicateLangError.equals(ex.getCode())) {
                     logger.error("Language detector initialization error", ex);
-                    throw new RuntimeException();
+                    throw new RuntimeException("Language detector initialization error");
                 }
             }
         }
@@ -57,12 +58,12 @@ public class LanguageIdentificationWithLangGuess {
                 languageIdentifier.append(nuplet.getKeyword().getValue());
                 final String detectedLanguage = languageIdentifier.detect();
                 nuplet.setLang(detectedLanguage);
-                output.collect(NullWritable.get(), nuplet);
                 reporter.incrCounter(Counters.class.getName(), detectedLanguage, 1l);
             } catch (LangDetectException ex) {
-                logger.error(ex);
+                nuplet.setKeyword(Keyword.NO_KEYWORD);
                 reporter.incrCounter(Counters.LANGUAGE_DETECTION_ERROR, 1l);
             }
+            output.collect(NullWritable.get(), nuplet);
         }
     }
 
@@ -89,7 +90,6 @@ public class LanguageIdentificationWithLangGuess {
                         reporter.incrCounter(Counters.REJECTED_AS_NON_ENGLISH, 1l);
                     }
                 } catch (LangDetectException ex) {
-                    logger.error(ex);
                     reporter.incrCounter(Counters.LANGUAGE_DETECTION_ERROR, 1l);
                 }
             }

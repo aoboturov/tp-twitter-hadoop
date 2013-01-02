@@ -29,7 +29,7 @@ public class PhraseTokenizer {
         private final static Logger logger = Logger.getLogger(PhraseTokenizerMap.class);
 
         enum Counters {
-            LANGUAGE_NOT_SUPPORTED, PRODUCED_STEMMED_ENTITIES
+            LANGUAGE_NOT_SUPPORTED, PRODUCED_STEMMED_ENTITIES, NUPLETS_WITH_NO_KEYWORD
         }
 
         private static final Version usedLuceneVersion = LUCENE_40;
@@ -81,38 +81,46 @@ public class PhraseTokenizer {
 
         @Override
         public void map(final NullWritable nothing, final Nuplet nuplet, final OutputCollector<NullWritable, Nuplet> output, final Reporter reporter) throws IOException {
-            if (!KeyType.RAW_TEXT.equals(nuplet.getKeyword().getType())) {
-                throw new RuntimeException("This Mapper is supposed to be used only with raw nuplets");
+            final String nupletType = nuplet.getKeyword().getType();
+            if (!KeyType.RAW_TEXT.equals(nupletType) && !KeyType.NULL.equals(nupletType)) {
+                throw new RuntimeException("This Mapper is supposed to be used either with raw nuplets or without a keyword");
             }
 
-            final Analyzer analyzer = analyzerMap.get().get(nuplet.getLang());
-            if (analyzer == null) {
-                // Skip those phrases which could not be analysed.
-                reporter.incrCounter(Counters.LANGUAGE_NOT_SUPPORTED, 1l);
-                return;
-            }
-
-            final TokenStream tokenStream = analyzer.tokenStream("a", new StringReader(nuplet.getKeyword().getValue()));
-            tokenStream.addAttribute(CharTermAttribute.class);
-            try {
-                tokenStream.reset();
-                while (tokenStream.incrementToken()) {
-                    final CharTermAttribute attribute = tokenStream.getAttribute(CharTermAttribute.class);
-                    final String tokenValue = attribute.toString();
-                    final Nuplet newNuplet = new Nuplet();
-                    newNuplet.setUser(nuplet.getUser());
-                    newNuplet.setLang(nuplet.getLang());
-                    newNuplet.setKeyword(new Keyword(KeyType.STEMMED_ENTITY, tokenValue));
-                    newNuplet.setItem(nuplet.getItem());
-                    // Produce new nuplet with updated key value.
-                    output.collect(NullWritable.get(), newNuplet);
-                    reporter.incrCounter(Counters.PRODUCED_STEMMED_ENTITIES, 1l);
+            if (KeyType.RAW_TEXT.equals(nupletType)) {
+                final Analyzer analyzer = analyzerMap.get().get(nuplet.getLang());
+                if (analyzer == null) {
+                    // When phrase was not detected consider it as without a keyword.
+                    reporter.incrCounter(Counters.LANGUAGE_NOT_SUPPORTED, 1l);
+                    nuplet.setKeyword(Keyword.NO_KEYWORD);
+                    output.collect(NullWritable.get(), nuplet);
+                } else {
+                    final TokenStream tokenStream = analyzer.tokenStream("a", new StringReader(nuplet.getKeyword().getValue()));
+                    tokenStream.addAttribute(CharTermAttribute.class);
+                    try {
+                        tokenStream.reset();
+                        while (tokenStream.incrementToken()) {
+                            final CharTermAttribute attribute = tokenStream.getAttribute(CharTermAttribute.class);
+                            final String tokenValue = attribute.toString();
+                            final Nuplet newNuplet = new Nuplet();
+                            newNuplet.setUser(nuplet.getUser());
+                            newNuplet.setLang(nuplet.getLang());
+                            newNuplet.setKeyword(new Keyword(KeyType.STEMMED_ENTITY, tokenValue));
+                            newNuplet.setItem(nuplet.getItem());
+                            // Produce new nuplet with updated key value.
+                            output.collect(NullWritable.get(), newNuplet);
+                            reporter.incrCounter(Counters.PRODUCED_STEMMED_ENTITIES, 1l);
+                        }
+                        tokenStream.end();
+                    } catch (IOException ex) {
+                        logger.error("Token stream error", ex);
+                    } finally {
+                        tokenStream.close();
+                    }
                 }
-                tokenStream.end();
-            } catch (Exception ex) {
-                logger.error("Token stream error", ex);
-            } finally {
-                tokenStream.close();
+            } else {
+                // KeyType.NULL is just passed as is.
+                reporter.incrCounter(Counters.NUPLETS_WITH_NO_KEYWORD, 1l);
+                output.collect(NullWritable.get(), nuplet);
             }
         }
     }
