@@ -8,8 +8,8 @@ import org.apache.hadoop.mapred.JobConf;
 public final class ConfigUtils {
 
     public static JobConf makeMapOutputCompressedWithBZip2(final JobConf conf) {
-        conf.setBoolean(org.apache.hadoop.mapreduce.lib.output.FileOutputFormat.COMPRESS, true);
-        conf.set("mapred.output.compression.codec", "org.apache.hadoop.io.compress.BZip2Codec");
+        conf.setBoolean("mapreduce.output.fileoutputformat.compress", true);
+        conf.set("mapreduce.output.fileoutputformat.compression.codec", "org.apache.hadoop.io.compress.BZip2Codec");
         return conf;
     }
 }

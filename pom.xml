@@ -7,11 +7,6 @@
     <version>0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <properties>
-        <hadoop-distribution-version>2.0.1-alpha</hadoop-distribution-version>
-        <hadoop-compatible-log4j-version>1.2.17</hadoop-compatible-log4j-version>
-    </properties>
-
     <developers>
         <developer>
             <name>Artem Oboturov</name>
@@ -48,6 +43,8 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
+                    <appendAssemblyId>true</appendAssemblyId>
+                    <finalName>twitter-jobs-standalone-${appended-profile-suffix}</finalName>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
@@ -55,6 +52,47 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>mariane</id>
+            <properties>
+                <hadoop-compatible-log4j-version>1.2.15</hadoop-compatible-log4j-version>
+                <hadoop-distribution-version>0.20.205.0</hadoop-distribution-version>
+                <appended-profile-suffix>mariane</appended-profile-suffix>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-core</artifactId>
+                    <version>${hadoop-distribution-version}</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>personal-server</id>
+            <properties>
+                <hadoop-compatible-log4j-version>1.2.17</hadoop-compatible-log4j-version>
+                <hadoop-distribution-version>2.0.1-alpha</hadoop-distribution-version>
+                <appended-profile-suffix>personal-server</appended-profile-suffix>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-common</artifactId>
+                    <version>${hadoop-distribution-version}</version>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <version>${hadoop-distribution-version}</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
@@ -80,18 +118,6 @@
                     <groupId>com.sun.jdmk</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-            <version>${hadoop-distribution-version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-mapreduce-client-core</artifactId>
-            <version>${hadoop-distribution-version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
