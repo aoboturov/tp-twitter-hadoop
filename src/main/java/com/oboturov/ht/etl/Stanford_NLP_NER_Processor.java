@@ -74,7 +74,7 @@ public class Stanford_NLP_NER_Processor {
 
         @Override
         public void map(final User user, final Nuplet nuplet, final OutputCollector<User, Nuplet> outputCollector, final Reporter reporter) throws IOException {
-            if (KeyType.PLAIN_TEXT.equals(nuplet.getKeyword().getType())) {
+            if (KeyType.RAW_TEXT.equals(nuplet.getKeyword().getType())) {
                 final List<List<CoreMap>> classification = classifier.classify(nuplet.getKeyword().getValue());
 
                 for ( final List<CoreMap> coreMaps : classification) {

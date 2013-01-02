@@ -23,7 +23,7 @@ public class Stanford_NLP_NER_ProcessorTest {
         final Nuplet aNuplet = new Nuplet();
         aNuplet.setUser(holland_hotels);
         aNuplet.setItem(new Item(ItemType.AT, "flytographer"));
-        aNuplet.setKeyword(new Keyword(KeyType.PLAIN_TEXT, "Twitter is in Los Angeles now Moscow William 15$ 14% White House Feb 31th"));
+        aNuplet.setKeyword(new Keyword(KeyType.RAW_TEXT, "Twitter is in Los Angeles now Moscow William 15$ 14% White House Feb 31th"));
 
         mapper.map(
                 holland_hotels,

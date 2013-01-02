@@ -36,7 +36,7 @@ public class LanguageIdentificationWithLangGuessTest {
         final Nuplet englishTextNuplet = new Nuplet();
         englishTextNuplet.setUser(anUser);
         englishTextNuplet.setItem(new Item(ItemType.AT, "otheruser"));
-        englishTextNuplet.setKeyword(new Keyword(KeyType.PLAIN_TEXT, "Bus is pulling out now. We gotta be in LA by 8 to check into the Paragon."));
+        englishTextNuplet.setKeyword(new Keyword(KeyType.RAW_TEXT, "Bus is pulling out now. We gotta be in LA by 8 to check into the Paragon."));
         mapper.map(
                 anUser,
                 englishTextNuplet,
@@ -48,7 +48,7 @@ public class LanguageIdentificationWithLangGuessTest {
         final Nuplet japaneseTextNuplet = new Nuplet();
         japaneseTextNuplet.setUser(anUser);
         japaneseTextNuplet.setItem(new Item(ItemType.AT, "otheruser"));
-        japaneseTextNuplet.setKeyword(new Keyword(KeyType.PLAIN_TEXT, "灰を灰皿に落とそうとすると高確率でヘッドセットの線を根性焼きする形になるんだが"));
+        japaneseTextNuplet.setKeyword(new Keyword(KeyType.RAW_TEXT, "灰を灰皿に落とそうとすると高確率でヘッドセットの線を根性焼きする形になるんだが"));
         mapper.map(
                 anUser,
                 japaneseTextNuplet,
@@ -60,7 +60,7 @@ public class LanguageIdentificationWithLangGuessTest {
         final Nuplet russianTextNuplet = new Nuplet();
         russianTextNuplet.setUser(anUser);
         russianTextNuplet.setItem(new Item(ItemType.AT, "otheruser"));
-        russianTextNuplet.setKeyword(new Keyword(KeyType.PLAIN_TEXT, "Абсолютно точно, что эта фраза написана на русском языке"));
+        russianTextNuplet.setKeyword(new Keyword(KeyType.RAW_TEXT, "Абсолютно точно, что эта фраза написана на русском языке"));
         mapper.map(
                 anUser,
                 russianTextNuplet,

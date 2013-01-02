@@ -5,7 +5,7 @@ package com.oboturov.ht;
  */
 public interface KeyType {
 
-    String PLAIN_TEXT = "text";
+    String RAW_TEXT = "raw";
     String NAMED_ENTITY = "ne";
     String STEMMED_ENTITY = "se";
 

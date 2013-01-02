@@ -23,7 +23,7 @@ public class GeneratedTweetsReader {
     public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, NullWritable, Tweet> {
 
         enum Counters {
-            GENERATED_TWEET_DESERIALIZATION_ERROR
+            GENERATED_TWEET_DESERIALIZATION_ERROR, TWEETS_DESERIALIZED
         }
 
         @Override
@@ -32,6 +32,7 @@ public class GeneratedTweetsReader {
                 final String tweetSerializedToJson = value.toString();
                 final Tweet tweet = ObjectMapperInstance.get().readValue(tweetSerializedToJson, Tweet.class);
                 output.collect(NullWritable.get(), tweet);
+                reporter.incrCounter(Counters.TWEETS_DESERIALIZED, 1l);
             } catch (IOException e) {
                 logger.error("Unable to read a generated Tweet", e);
                 reporter.incrCounter(Counters.GENERATED_TWEET_DESERIALIZATION_ERROR, 1l);

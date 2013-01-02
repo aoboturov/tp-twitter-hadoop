@@ -45,7 +45,7 @@ public class LanguageIdentificationWithLangGuess {
 
         @Override
         public void map(final User user, final Nuplet nuplet, final OutputCollector<User, Nuplet> outputCollector, final Reporter reporter) throws IOException {
-            if (KeyType.PLAIN_TEXT.equals(nuplet.getKeyword().getType())) {
+            if (KeyType.RAW_TEXT.equals(nuplet.getKeyword().getType())) {
                 try {
                     final Detector languageIdentifier = DetectorFactory.create();
                     languageIdentifier.append(nuplet.getKeyword().getValue());
@@ -65,7 +65,7 @@ public class LanguageIdentificationWithLangGuess {
 
         @Override
         public void map(final User user, final Nuplet nuplet, final OutputCollector<User, Nuplet> outputCollector, final Reporter reporter) throws IOException {
-            if (KeyType.PLAIN_TEXT.equals(nuplet.getKeyword().getType())) {
+            if (KeyType.RAW_TEXT.equals(nuplet.getKeyword().getType())) {
                 try {
                     final Detector languageIdentifier = DetectorFactory.create();
                     languageIdentifier.append(nuplet.getKeyword().getValue());

@@ -73,7 +73,7 @@ public class PhraseTokenizer {
                 // Skip those phrases which could not be analysed.
                 return;
             }
-            if (!KeyType.PLAIN_TEXT.equals(nuplet.getKeyword().getType())) {
+            if (!KeyType.RAW_TEXT.equals(nuplet.getKeyword().getType())) {
                 // Analyse only plain text.
                 return;
             }

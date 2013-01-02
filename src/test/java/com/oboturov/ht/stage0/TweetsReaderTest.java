@@ -4,12 +4,14 @@ import com.oboturov.ht.Tweet;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reporter;
 import org.testng.annotations.Test;
 
 import java.io.FileReader;
 import java.io.LineNumberReader;
 
 import static org.mockito.Mockito.*;
+import static com.oboturov.ht.stage0.TweetsReader.Map.Counters.TWEETS_READ;
 
 /**
  * @author aoboturov
@@ -20,11 +22,12 @@ public class TweetsReaderTest {
     public void reads_valid_tweet_data() throws Exception {
         final LineNumberReader lineReader = new LineNumberReader(new FileReader("src/test/data/com/oboturov/ht/etl/valid-tweets-sample-file.txt"));
         final OutputCollector<NullWritable, Tweet> output = mock(OutputCollector.class);
+        final Reporter reporter = mock(Reporter.class);
         final TweetsReader.Map mapper = new TweetsReader.Map();
 
         String nextLine = lineReader.readLine();
         while (nextLine != null) {
-            mapper.map(null, new Text(nextLine), output, null);
+            mapper.map(null, new Text(nextLine), output, reporter);
             nextLine = lineReader.readLine();
         }
 
@@ -78,6 +81,8 @@ public class TweetsReaderTest {
                         "Eden Amsterdam American Hotel (****) on various dates for 110 .. http://bit.ly/mbGoR"
                 ))
         );
+
+        verify(reporter, times(6)).incrCounter(eq(TWEETS_READ), anyLong());
     }
 
 }

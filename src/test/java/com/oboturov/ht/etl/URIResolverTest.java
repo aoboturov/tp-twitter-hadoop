@@ -32,7 +32,7 @@ public class URIResolverTest {
         final Nuplet aNuplet = new Nuplet();
         aNuplet.setUser(aUser);
         aNuplet.setItem(new Item(ItemType.URL, "http://:malformed.URL"));
-        aNuplet.setKeyword(new Keyword(KeyType.PLAIN_TEXT, "some text"));
+        aNuplet.setKeyword(new Keyword(KeyType.RAW_TEXT, "some text"));
 
         mapper.map(aUser, aNuplet, output, null);
 
@@ -45,7 +45,7 @@ public class URIResolverTest {
 
         final User aUser = new User();
         aUser.setName("user");
-        final Keyword aKeyword = new Keyword(KeyType.PLAIN_TEXT, "some text");
+        final Keyword aKeyword = new Keyword(KeyType.RAW_TEXT, "some text");
 
         final Nuplet aNuplet = new Nuplet();
         aNuplet.setUser(aUser);
@@ -70,7 +70,7 @@ public class URIResolverTest {
         aUser.setName("user");
         final Nuplet aNuplet = new Nuplet();
         aNuplet.setUser(aUser);
-        aNuplet.setKeyword(new Keyword(KeyType.PLAIN_TEXT, "some text"));
+        aNuplet.setKeyword(new Keyword(KeyType.RAW_TEXT, "some text"));
 
         for (final String host : URIResolver.Map.DEAD_SHORTENERS.keySet()) {
             final String shortenedUrl = String.format("http://%s/something.html", host);
@@ -90,7 +90,7 @@ public class URIResolverTest {
         aUser.setName("user");
         final Nuplet aNuplet = new Nuplet();
         aNuplet.setUser(aUser);
-        aNuplet.setKeyword(new Keyword(KeyType.PLAIN_TEXT, "some text"));
+        aNuplet.setKeyword(new Keyword(KeyType.RAW_TEXT, "some text"));
         aNuplet.setItem(new Item(ItemType.URL, "https://google.com"));
 
         mapper.map(aUser, aNuplet, output, null);
@@ -106,7 +106,7 @@ public class URIResolverTest {
 
         final User aUser = new User();
         aUser.setName("user");
-        final Keyword aKeyword = new Keyword(KeyType.PLAIN_TEXT, "some text");
+        final Keyword aKeyword = new Keyword(KeyType.RAW_TEXT, "some text");
 
         final Nuplet aNuplet = new Nuplet();
         aNuplet.setUser(aUser);
@@ -128,7 +128,7 @@ public class URIResolverTest {
 
         final User aUser = new User();
         aUser.setName("user");
-        final Keyword aKeyword = new Keyword(KeyType.PLAIN_TEXT, "some text");
+        final Keyword aKeyword = new Keyword(KeyType.RAW_TEXT, "some text");
 
         final Nuplet aNuplet = new Nuplet();
         aNuplet.setUser(aUser);

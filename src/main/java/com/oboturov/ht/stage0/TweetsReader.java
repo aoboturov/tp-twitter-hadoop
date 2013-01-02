@@ -22,7 +22,7 @@ public class TweetsReader {
     public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, NullWritable, Tweet> {
 
         enum Counters {
-            ILLEGAL_DATE, NON_NORMALIZABLE_USER_NAME
+            ILLEGAL_DATE, NON_NORMALIZABLE_USER_NAME, TWEETS_READ
         }
 
         private static final String HTTP_TWITTER_COM = "http://twitter.com/";
@@ -98,6 +98,7 @@ public class TweetsReader {
                     return;
                 }
                 output.collect(NullWritable.get(), new Tweet(this.user, this.time, this.post));
+                reporter.incrCounter(Counters.TWEETS_READ, 1l);
             } finally {
                 reset();
             }
