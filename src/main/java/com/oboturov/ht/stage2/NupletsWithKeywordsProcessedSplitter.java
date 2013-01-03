@@ -24,18 +24,18 @@ public class NupletsWithKeywordsProcessedSplitter extends Configured implements 
 
             // Nuplets with keywords only.
             if (ItemType.NULL.equals(nupletItemType)) {
-                return "nuplets-with-no-items";
+                return "nuplets-with-no-items.txt";
             }
 
             // Nuplets with items.
             if (ItemType.URL.equals(nupletItemType)) {
-                return "nuplets-requiring-uris-resolution";
+                return "nuplets-requiring-uris-resolution.txt";
             }
 
             if (KeyType.NULL.equals(nuplet.getKeyword().getType())) {
-                return "nuplets-with-no-keywords-and-no-uris";
+                return "nuplets-with-no-keywords-and-no-uris.txt";
             }
-            return "nuplets-with-keywords-and-no-uris";
+            return "nuplets-with-keywords-and-no-uris.txt";
         }
     }
 
