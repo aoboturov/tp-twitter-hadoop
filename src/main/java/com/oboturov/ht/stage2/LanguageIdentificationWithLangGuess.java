@@ -4,6 +4,7 @@ import com.cybozu.labs.langdetect.Detector;
 import com.cybozu.labs.langdetect.DetectorFactory;
 import com.cybozu.labs.langdetect.ErrorCode;
 import com.cybozu.labs.langdetect.LangDetectException;
+import com.oboturov.ht.ItemType;
 import com.oboturov.ht.KeyType;
 import com.oboturov.ht.Keyword;
 import com.oboturov.ht.Nuplet;
@@ -26,7 +27,7 @@ public class LanguageIdentificationWithLangGuess {
         private final static Logger logger = Logger.getLogger(LanguageIdentificationMap.class);
 
         enum Counters {
-            LANGUAGE_DETECTION_ERROR
+            NUPLETS_WITH_ITEMS_BUT_LANGUAGE_NOT_IDENTIFIED, NUPLETS_DISCARDED_BECAUSE_LANGUAGE_WAS_NOT_IDENTIFIED_AND_NO_ITEMS
         }
 
         public static final String[] DETECTABLE_LANGUAGES = {
@@ -60,8 +61,13 @@ public class LanguageIdentificationWithLangGuess {
                 nuplet.setLang(detectedLanguage);
                 reporter.incrCounter(Counters.class.getName(), detectedLanguage, 1l);
             } catch (LangDetectException ex) {
-                nuplet.setKeyword(Keyword.NO_KEYWORD);
-                reporter.incrCounter(Counters.LANGUAGE_DETECTION_ERROR, 1l);
+                if (ItemType.NULL.equals(nuplet.getItem().getType())) {
+                    reporter.incrCounter(Counters.NUPLETS_DISCARDED_BECAUSE_LANGUAGE_WAS_NOT_IDENTIFIED_AND_NO_ITEMS, 1l);
+                    return;
+                } else {
+                    nuplet.setKeyword(Keyword.NO_KEYWORD);
+                    reporter.incrCounter(Counters.NUPLETS_WITH_ITEMS_BUT_LANGUAGE_NOT_IDENTIFIED, 1l);
+                }
             }
             output.collect(NullWritable.get(), nuplet);
         }
