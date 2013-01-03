@@ -24,6 +24,7 @@ import java.io.IOException;
  *   <li>output file name</li>
  * </ol>
  * @author aoboturov
+ * @see com.oboturov.ht.stage0.TweetsReader.Map.Counters#TWEETS_READ
  */
 public class TweetsCounter extends Configured implements Tool {
 

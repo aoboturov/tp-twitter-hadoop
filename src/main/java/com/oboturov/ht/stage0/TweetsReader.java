@@ -22,7 +22,7 @@ public class TweetsReader {
     public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, NullWritable, Tweet> {
 
         enum Counters {
-            ILLEGAL_DATE, NON_NORMALIZABLE_USER_NAME, TWEETS_READ
+            ILLEGAL_DATE, NON_NORMALIZABLE_USER_NAME, TWEETS_READ, EMPTY_POSTS
         }
 
         private static final String HTTP_TWITTER_COM = "http://twitter.com/";
@@ -48,11 +48,16 @@ public class TweetsReader {
             post = null;
         }
 
-        public void map(final LongWritable key, final Text value, final OutputCollector<NullWritable, Tweet> output, final Reporter reporter) throws IOException {
+        public void map(final LongWritable offset, final Text value, final OutputCollector<NullWritable, Tweet> output, final Reporter reporter) throws IOException {
             final String line = value.toString();
             // Reset previous tweets here.
-            if (line == null || line.isEmpty() || line.length() < 3) {
+            if (line == null || line.isEmpty()) {
                 skipTweet = false;
+                reset();
+                return;
+            }
+            if (line.length() < 3) {
+                skipTweet = true;
                 reset();
                 return;
             }
@@ -64,7 +69,7 @@ public class TweetsReader {
                         this.time = dateFormat.get().parse(text).getTime();
                     } catch (final ParseException e) {
                         skipTweet = true;
-                        logger.error(String.format("At %d, Wrong date format for date: '%s'", key.get(), text));
+                        logger.error(String.format("At %d, Wrong date format for date: '%s'", offset.get(), text));
                         reporter.setStatus("Detected illegal date");
                         reporter.incrCounter(Counters.ILLEGAL_DATE, 1l);
                     }
@@ -76,7 +81,8 @@ public class TweetsReader {
                         this.user = "@"+text.substring(HTTP_WWW_TWITTER_COM.length());
                     } else {
                         this.user = text;
-                        logger.error(String.format("At %d, Not normalized user name: '%s'", key.get(), text));
+                        logger.error(String.format("At %d, Not normalized user name: '%s'", offset.get(), text));
+                        skipTweet = true;
                         reporter.setStatus("Detected non-normalizable user name");
                         reporter.incrCounter(Counters.NON_NORMALIZABLE_USER_NAME, 1l);
                     }
@@ -85,9 +91,11 @@ public class TweetsReader {
                     this.post = text;
                     if (EMPTY_POST_INDICATION.equals(text)) {
                         skipTweet = true;
+                        reporter.incrCounter(Counters.EMPTY_POSTS, 1l);
                     }
                     break;
                 default:
+                    skipTweet = true;
                     return;
             }
             if (this.time == null || this.user == null || this.post == null) {
