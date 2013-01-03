@@ -9,5 +9,6 @@ public interface ItemType {
     String HASH = "#";
     String CASH = "$";
     String URL = "url";
+    String NULL = "_";
 
 }

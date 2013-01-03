@@ -15,6 +15,8 @@ import java.io.IOException;
  */
 public class Item implements WritableComparable<Item> {
 
+    public static final Item NULL = new Item(ItemType.NULL, "");
+
     private String type;
     private String value;
 

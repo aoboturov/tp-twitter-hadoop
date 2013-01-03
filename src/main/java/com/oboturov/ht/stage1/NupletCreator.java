@@ -22,7 +22,8 @@ public class NupletCreator {
         private final static Logger logger = Logger.getLogger(Map.class);
 
         enum Counters {
-            SKIPPED_CASHTAG_NUPLET, ILLEGAL_TWEET_ENTITY_TYPE, NUPLETS_GENERATED
+            SKIPPED_CASHTAG_NUPLET, ILLEGAL_TWEET_ENTITY_TYPE, NUPLETS_WITH_ITEMS_GENERATED,
+            NUPLETS_WITH_ONLY_KEYWORDS_GENERATED
         }
 
         private final ThreadLocal<Extractor> extractor = new ThreadLocal<Extractor>() {
@@ -51,6 +52,8 @@ public class NupletCreator {
             final String rawText = extractRawTextFromTweetPost(text, entities);
 
             final User user = tweet.getUser();
+
+            // Generate one nuplet per Item.
             for (Extractor.Entity entity : entities) {
                 String type;
                 switch (entity.getType()) {
@@ -78,8 +81,16 @@ public class NupletCreator {
                 nuplet.setKeyword(new Keyword(KeyType.RAW_TEXT, rawText));
                 nuplet.setItem(item);
                 output.collect(NullWritable.get(), nuplet);
-                reporter.incrCounter(Counters.NUPLETS_GENERATED, 1l);
+                reporter.incrCounter(Counters.NUPLETS_WITH_ITEMS_GENERATED, 1l);
             }
+
+            // Generate a nuplet with no Item.
+            final Nuplet nuplet = new Nuplet();
+            nuplet.setUser(user);
+            nuplet.setKeyword(new Keyword(KeyType.RAW_TEXT, rawText));
+            nuplet.setItem(Item.NULL);
+            output.collect(NullWritable.get(), nuplet);
+            reporter.incrCounter(Counters.NUPLETS_WITH_ONLY_KEYWORDS_GENERATED, 1l);
         }
     }
 

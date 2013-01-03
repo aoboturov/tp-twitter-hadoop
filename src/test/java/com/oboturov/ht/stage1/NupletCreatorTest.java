@@ -65,10 +65,11 @@ public class NupletCreatorTest {
         );
 
         // Do not process text only tweets.
-        verify(output, atMost(2)).collect(any(NullWritable.class), any(Nuplet.class));
+        verify(output, times(5)).collect(any(NullWritable.class), any(Nuplet.class));
 
         verify(reporter, never()).incrCounter(eq(ILLEGAL_TWEET_ENTITY_TYPE), any(Long.class));
-        verify(reporter, times(2)).incrCounter(eq(NUPLETS_GENERATED), any(Long.class));
+        verify(reporter, times(2)).incrCounter(eq(NUPLETS_WITH_ITEMS_GENERATED), any(Long.class));
+        verify(reporter, times(3)).incrCounter(eq(NUPLETS_WITH_ONLY_KEYWORDS_GENERATED), any(Long.class));
     }
 
 }
