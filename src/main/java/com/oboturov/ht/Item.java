@@ -49,7 +49,11 @@ public class Item implements WritableComparable<Item> {
     }
 
     public static void writeWritable(final Item anItem, final DataOutput dataOutput) throws IOException {
-        anItem.write(dataOutput);
+        if (anItem == null) {
+            NULL.write(dataOutput);
+        } else {
+            anItem.write(dataOutput);
+        }
     }
 
     public static Item readWritable(final DataInput dataInput) throws IOException {

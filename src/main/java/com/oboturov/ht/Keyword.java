@@ -49,7 +49,11 @@ public class Keyword implements WritableComparable<Keyword> {
     }
 
     public static void writeWritable(final Keyword aKeyword, final DataOutput dataOutput) throws IOException {
-        aKeyword.write(dataOutput);
+        if (aKeyword == null) {
+            NO_KEYWORD.write(dataOutput);
+        } else {
+            aKeyword.write(dataOutput);
+        }
     }
 
     public static Keyword readWritable(final DataInput dataInput) throws IOException {
