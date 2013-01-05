@@ -1,4 +1,4 @@
-package com.oboturov.ht.etl;
+package com.oboturov.ht.stage3;
 
 import com.oboturov.ht.Item;
 import com.oboturov.ht.ItemType;
@@ -34,16 +34,16 @@ public class URIResolver {
      */
     public static class Map extends MapReduceBase implements Mapper<User, Nuplet, User, Nuplet> {
 
-        public static final HashMap<String, Boolean> DEAD_SHORTENERS = new HashMap<String, Boolean>(128);
-        public static final HashMap<String, Boolean> VALID_SHORTENERS = new HashMap<String, Boolean>(128);
+        public static final HashMap<String, Boolean> DEAD_SHORTENERS = new HashMap<>(128);
+        public static final HashMap<String, Boolean> VALID_SHORTENERS = new HashMap<>(128);
 
         static {
             HttpURLConnection.setFollowRedirects(false);
             URLConnection.setDefaultAllowUserInteraction(false);
         }
 
-        private static final String DEAD_SERVICES_LIST = "/shorteners/dead.txt";
-        private static final String VALID_SERVICES_LIST = "/shorteners/valid.txt";
+        private static final String DEAD_SERVICES_LIST = "/com/oboturov/ht/stage3/dead.txt";
+        private static final String VALID_SERVICES_LIST = "/com/oboturov/ht/stage3/valid.txt";
 
         static {
             final InputStream deadShortenersInputStream = Map.class.getResourceAsStream(DEAD_SERVICES_LIST);
@@ -75,8 +75,13 @@ public class URIResolver {
             }
         }
 
+        enum Counters {
+            LINKS_TO_DEAD_SHORTENERS, SHORTENED_LINKS_RESOLVED, RESOLUTIONS_FAILED, ILLEGAL_URIS, TOTAL_URIS_ACCEPTED,
+            NETWORK_CONNECTION_ERRORS
+        }
+
         /**
-         * Resolve each {@link com.oboturov.ht.ItemType.URL } to real URI if exists.
+         * Resolve each {@link com.oboturov.ht.ItemType#URL } to real URI if exists.
          * @param user
          * @param nuplet
          */
@@ -92,6 +97,7 @@ public class URIResolver {
                     }
                     final URL url = new URL(link);
                     if (DEAD_SHORTENERS.containsKey(url.getHost())) {// Discard those shortened URLs which could not be resolved.
+                        reporter.incrCounter(Counters.LINKS_TO_DEAD_SHORTENERS, 1l);
                         return;
                     }
                     if (VALID_SHORTENERS.containsKey(url.getHost())) {// Handle redirect to full URL.
@@ -112,7 +118,9 @@ public class URIResolver {
                                         if (location != null) {
                                             final URL locationUrl = new URL(location);
                                             nuplet.setItem(new Item(ItemType.URL, location));
+                                            reporter.incrCounter(Counters.SHORTENED_LINKS_RESOLVED, 1l);
                                         } else {
+                                            reporter.incrCounter(Counters.RESOLUTIONS_FAILED, 1l);
                                             return;
                                         }
                                         break;
@@ -121,20 +129,23 @@ public class URIResolver {
                                 }
                             } else {
                                 // Do not handle non-HTTP links.
+                                reporter.incrCounter(Counters.ILLEGAL_URIS, 1l);
                                 return;
                             }
                         } catch (IOException e) {
                             logger.error("URL connection error", e);
+                            reporter.incrCounter(Counters.NETWORK_CONNECTION_ERRORS, 1l);
                             return;
                         }
                     }
                 } catch (MalformedURLException e) {
                     logger.error("Illegal URL", e);
+                    reporter.incrCounter(Counters.ILLEGAL_URIS, 1l);
                     return;
                 }
             }
             output.collect(user, nuplet);
+            reporter.incrCounter(Counters.TOTAL_URIS_ACCEPTED, 1l);
         }
     }
-
 }
