@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<configuration>
+    <property>
+        <name>fs.default.name</name>
+        <value>file:///</value>
+    </property>
+    <property>
+        <name>mapred.job.tracker</name>
+        <value>local</value>
+    </property>
+    <property>
+        <name>keep.failed.task.files</name>
+        <value>true</value>
+    </property>
+</configuration>
