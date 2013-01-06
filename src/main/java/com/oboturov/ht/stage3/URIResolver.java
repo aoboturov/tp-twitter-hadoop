@@ -3,7 +3,7 @@ package com.oboturov.ht.stage3;
 import com.oboturov.ht.Item;
 import com.oboturov.ht.ItemType;
 import com.oboturov.ht.Nuplet;
-import com.oboturov.ht.User;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
@@ -32,7 +32,7 @@ public class URIResolver {
      * <a href='code.google.com/p/shortenurl/wiki/URLShorteningServices'>code.google.com/p/shortenurl/wiki/URLShorteningServices</a>
      * list.
      */
-    public static class Map extends MapReduceBase implements Mapper<User, Nuplet, User, Nuplet> {
+    public static class Map extends MapReduceBase implements Mapper<NullWritable, Nuplet, NullWritable, Nuplet> {
 
         public static final HashMap<String, Boolean> DEAD_SHORTENERS = new HashMap<>(128);
         public static final HashMap<String, Boolean> VALID_SHORTENERS = new HashMap<>(128);
@@ -82,11 +82,10 @@ public class URIResolver {
 
         /**
          * Resolve each {@link com.oboturov.ht.ItemType#URL } to real URI if exists.
-         * @param user
          * @param nuplet
          */
         @Override
-        public void map(final User user, final Nuplet nuplet, final OutputCollector<User, Nuplet> output, final Reporter reporter) throws IOException {
+        public void map(final NullWritable nothing, final Nuplet nuplet, final OutputCollector<NullWritable, Nuplet> output, final Reporter reporter) throws IOException {
             if (ItemType.URL.equals(nuplet.getItem().getType())) {
                 try {
                     String link = nuplet.getItem().getValue();
@@ -144,7 +143,7 @@ public class URIResolver {
                     return;
                 }
             }
-            output.collect(user, nuplet);
+            output.collect(nothing, nuplet);
             reporter.incrCounter(Counters.TOTAL_URIS_ACCEPTED, 1l);
         }
     }
