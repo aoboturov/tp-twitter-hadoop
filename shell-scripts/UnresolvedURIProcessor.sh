@@ -25,4 +25,4 @@ export LOG_FILE="${OUTPUT_FILE_NAME}.log"
 
 rm $LOG_FILE
 hadoop jar $TP_TWITTER_JAR $JOB_TO_RUN -conf $JOB_CONFIG $INPUT_FILES_CONCATENATED $OUTPUT_DIR >> $LOG_FILE 2>&1
-tail -n 200 $LOG_FILE | mail -s "$JOB_TO_RUN Hadoop job for the $INPUT_FILE_NAME had finished" $JOB_OWNER_EMAIL
+tail -n 200 $LOG_FILE | mail -s "$JOB_TO_RUN $1 Hadoop job for the $INPUT_FILE_NAME had finished" $JOB_OWNER_EMAIL
