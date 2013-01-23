@@ -34,8 +34,8 @@ public class URISeparator {
 
         private MultipleOutputs multipleOutputs;
 
-        public static final HashMap<String, Boolean> DEAD_SHORTENERS = new HashMap<>(128);
-        public static final HashMap<String, Boolean> VALID_SHORTENERS = new HashMap<>(128);
+        public static final HashMap<String, Boolean> DEAD_SHORTENERS = new HashMap<String, Boolean>(128);
+        public static final HashMap<String, Boolean> VALID_SHORTENERS = new HashMap<String, Boolean>(128);
 
         private static final String DEAD_SERVICES_LIST = "/com/oboturov/ht/stage3/dead.txt";
         private static final String VALID_SERVICES_LIST = "/com/oboturov/ht/stage3/valid.txt";

@@ -37,7 +37,7 @@ public class PhraseTokenizer {
         private static final ThreadLocal<Map<String, Analyzer>> analyzerMap = new ThreadLocal<Map<String, Analyzer>>() {
             @Override
             protected Map<String, Analyzer> initialValue() {
-                final Map<String, Analyzer> map = new HashMap<>();
+                final Map<String, Analyzer> map = new HashMap<String, Analyzer>();
 
                 map.put("ar", new org.apache.lucene.analysis.ar.ArabicAnalyzer(usedLuceneVersion));
                 map.put("bg", new org.apache.lucene.analysis.bg.BulgarianAnalyzer(usedLuceneVersion));
