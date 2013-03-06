@@ -15,4 +15,6 @@ normalized_tweets = FOREACH tweets GENERATE com.oboturov.ht.pig.SanitizeUserId(u
 
 sanitized_tweets = FILTER normalized_tweets BY user_id IS NOT NULL AND text IS NOT NULL;
 
-dump sanitized_tweets;
+tweets_with_extracted_entities = FOREACH sanitized_tweets GENERATE $0, com.oboturov.ht.pig.TweetEntityExtractor($1);
+
+dump tweets_with_extracted_entities;

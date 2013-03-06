@@ -1,6 +1,7 @@
 package com.oboturov.ht.stage1;
 
 import com.oboturov.ht.*;
+import com.oboturov.ht.pig.TweetEntityExtractor;
 import com.twitter.Extractor;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.MapReduceBase;
@@ -33,23 +34,12 @@ public class NupletCreator {
             }
         };
 
-        private String extractRawTextFromTweetPost(final String post, final List<Extractor.Entity> entities) {
-            int left = 0;
-            final StringBuilder rawText = new StringBuilder(post.length());
-            for (Extractor.Entity entity : entities) {
-                rawText.append(post.substring(left, entity.getStart()));
-                left = entity.getEnd();
-            }
-            rawText.append(post.substring(left, post.length()));
-            return rawText.toString();
-        }
-
         @Override
         public void map(final NullWritable offset, final Tweet tweet, final OutputCollector<NullWritable, Nuplet> output, final Reporter reporter) throws IOException {
             final String text = tweet.getPost();
             // Handle hashes.
             final List<Extractor.Entity> entities = extractor.get().extractEntitiesWithIndices(text);
-            final String rawText = extractRawTextFromTweetPost(text, entities);
+            final String rawText = TweetEntityExtractor.extractRawTextFromTweetPost(text, entities);
 
             final User user = tweet.getUser();
 
