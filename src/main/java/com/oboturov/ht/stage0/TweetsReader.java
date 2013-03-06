@@ -1,6 +1,8 @@
 package com.oboturov.ht.stage0;
 
 import com.oboturov.ht.Tweet;
+import com.oboturov.ht.pig.SanitizeTweetText;
+import com.oboturov.ht.pig.SanitizeUserId;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
@@ -24,10 +26,6 @@ public class TweetsReader {
         enum Counters {
             ILLEGAL_DATE, NON_NORMALIZABLE_USER_NAME, TWEETS_READ, EMPTY_POSTS
         }
-
-        private static final String HTTP_TWITTER_COM = "http://twitter.com/";
-        private static final String HTTP_WWW_TWITTER_COM = "http://www.twitter.com/";
-        private static final String EMPTY_POST_INDICATION = "No Post Title";
 
         private static ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
             @Override
@@ -75,12 +73,8 @@ public class TweetsReader {
                     }
                     return;
                 case 'U':
-                    if (text.startsWith(HTTP_TWITTER_COM)) {
-                        this.user = "@"+text.substring(HTTP_TWITTER_COM.length());
-                    } else if (text.startsWith(HTTP_WWW_TWITTER_COM)) {
-                        this.user = "@"+text.substring(HTTP_WWW_TWITTER_COM.length());
-                    } else {
-                        this.user = text;
+                    this.user = SanitizeUserId.sanitize(text);
+                    if (this.user == null) {
                         logger.error(String.format("At %d, Not normalized user name: '%s'", offset.get(), text));
                         skipTweet = true;
                         reporter.setStatus("Detected non-normalizable user name");
@@ -88,8 +82,8 @@ public class TweetsReader {
                     }
                     return;
                 case 'W':
-                    this.post = text;
-                    if (EMPTY_POST_INDICATION.equals(text)) {
+                    this.post = SanitizeTweetText.sanitize(text);
+                    if (this.post == null) {
                         skipTweet = true;
                         reporter.incrCounter(Counters.EMPTY_POSTS, 1l);
                     }
