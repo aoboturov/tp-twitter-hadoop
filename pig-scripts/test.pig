@@ -9,6 +9,8 @@
 
 REGISTER $UDF_JAR_FILE;
 
+DEFINE BagConcat datafu.pig.bags.BagConcat();
+
 tweets = LOAD '$DATASET_FILE' USING PigStorage('\t') AS (T, time, user_id:chararray, text:chararray);
 --dump tweets;
 --(T,2009-06-11 16:56:43,http://twitter.com/gabanact,@SamanthaFoxx I mean I can agree Sunday)
@@ -23,5 +25,17 @@ tweets_with_extracted_entities = FOREACH sanitized_tweets GENERATE $0, FLATTEN(c
 --dump tweets_with_extracted_entities;
 --(@gabanact,{(@SamanthaFoxx)},{(#MOA09)},{(http://bit.ly/1Lg4p)}, I mean I can agree Sunday)
 
-non_merged_tuples = FOREACH tweets_with_extracted_entities GENERATE $0 AS user_id:chararray, $1 AS mentions:bag {T: tuple(mention:chararray)}, $2 AS hashtags:bag {T: tuple(hashtag:chararray)}, com.oboturov.ht.pig.InvalidUrlRemover($3) AS urls:bag {T: tuple(url:chararray)}, com.oboturov.ht.pig.TextTokenizer($4) AS tokens:bag {T: tuple(token:chararray)};
-dump non_merged_tuples;
+/*
+ * For user similarity based on items only.
+ */
+non_merged_tuples_with_items_only = FOREACH tweets_with_extracted_entities GENERATE $0 AS user_id:chararray, BagConcat($1, $2, com.oboturov.ht.pig.InvalidUrlRemover($3)) AS items:bag {T: tuple(mention:chararray)};
+--dump non_merged_tuples_with_items_only;
+--(@webkarnage,{(@Societysarah),(http://www.realmacsoftware.com/forums/index.php/forums/)})
+
+non_merged_tuples_with_items_only_having_some_items = FILTER non_merged_tuples_with_items_only BY NOT IsEmpty(items);
+--dump non_merged_tuples_with_items_only_having_some_items;
+
+grouped_non_merged_tuples_with_items_only_having_some_items = GROUP non_merged_tuples_with_items_only_having_some_items BY user_id;
+--dump grouped_non_merged_tuples_with_items_only_having_some_items;
+
+merged_non_merged_tuples_with_items_only_having_some_items = FOREACH grouped_non_merged_tuples_with_items_only_having_some_items GENERATE group, com.oboturov.ht.pig.MergeGroupedBags($1);
