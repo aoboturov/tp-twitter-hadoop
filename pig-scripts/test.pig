@@ -2,6 +2,7 @@
  * This script requires following parameters to be defined:
  *  - UDF_JAR_FILE
  *  - DATASET_FILE
+ *  - TUPLES_WITH_ITEMS_ONLY_FILE
  */
 
 --bin/pig -x local
@@ -39,3 +40,14 @@ grouped_non_merged_tuples_with_items_only_having_some_items = GROUP non_merged_t
 --dump grouped_non_merged_tuples_with_items_only_having_some_items;
 
 merged_non_merged_tuples_with_items_only_having_some_items = FOREACH grouped_non_merged_tuples_with_items_only_having_some_items GENERATE group, com.oboturov.ht.pig.MergeGroupedBags($1);
+
+STORE merged_non_merged_tuples_with_items_only_having_some_items INTO '$TUPLES_WITH_ITEMS_ONLY_FILE' USING PigStorage;
+
+tuples_with_items_only_l = LOAD '$TUPLES_WITH_ITEMS_ONLY_FILE' AS (user_id_l:chararray, items_l:bag {T: tuple(item:chararray)});
+tuples_with_items_only_r = LOAD '$TUPLES_WITH_ITEMS_ONLY_FILE' AS (user_id_r:chararray, items_r:bag {T: tuple(item:chararray)});
+
+user_user_pairs_with_items_only = CROSS tuples_with_items_only_l, tuples_with_items_only_r;
+
+user_user_pairs_with_items_only_similarity = FOREACH user_user_pairs_with_items_only GENERATE user_id_l, user_id_r, 1.0 - ((double)SIZE(DIFF(items_l, items_r)))/((double)SIZE(BagConcat(items_l, items_r))) AS sim:double;
+
+result_similarity_with_items_only = FILTER user_user_pairs_with_items_only_similarity BY user_id_l != user_id_r;
