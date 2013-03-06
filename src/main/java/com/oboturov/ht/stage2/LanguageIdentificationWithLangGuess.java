@@ -2,12 +2,12 @@ package com.oboturov.ht.stage2;
 
 import com.cybozu.labs.langdetect.Detector;
 import com.cybozu.labs.langdetect.DetectorFactory;
-import com.cybozu.labs.langdetect.ErrorCode;
 import com.cybozu.labs.langdetect.LangDetectException;
 import com.oboturov.ht.ItemType;
 import com.oboturov.ht.KeyType;
 import com.oboturov.ht.Keyword;
 import com.oboturov.ht.Nuplet;
+import com.oboturov.ht.pig.TextTokenizer;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
@@ -30,37 +30,16 @@ public class LanguageIdentificationWithLangGuess {
             NUPLETS_WITH_ITEMS_BUT_LANGUAGE_NOT_IDENTIFIED, NUPLETS_DISCARDED_BECAUSE_LANGUAGE_WAS_NOT_IDENTIFIED_AND_NO_ITEMS
         }
 
-        public static final String[] DETECTABLE_LANGUAGES = {
-                "af", "ar", "bg", "bn", "cs", "da", "de", "el", "en", "es", "fa", "fi", "fr", "gu", "he", "hi", "hr",
-                "hu", "id", "it", "ja", "kn", "ko", "mk", "ml", "mr", "ne", "nl", "no", "pa", "pl", "pt", "ro", "ru",
-                "sk", "so", "sq", "sv", "sw", "ta", "te", "th", "tl", "tr", "uk", "ur", "vi", "zh-cn", "zh-tw"
-        };
-
-        static {
-            try {
-                DetectorFactory.loadProfile(LanguageIdentificationMap.class.getClassLoader(), "languages",
-                        LanguageIdentificationWithLangGuess.LanguageIdentificationMap.DETECTABLE_LANGUAGES);
-            } catch (LangDetectException ex) {
-                // OK if during testing it loads duplicates.
-                if (!ErrorCode.DuplicateLangError.equals(ex.getCode())) {
-                    logger.error("Language detector initialization error", ex);
-                    throw new RuntimeException("Language detector initialization error");
-                }
-            }
-        }
-
         @Override
         public void map(final NullWritable nothing, final Nuplet nuplet, final OutputCollector<NullWritable, Nuplet> output, final Reporter reporter) throws IOException {
             if (!KeyType.RAW_TEXT.equals(nuplet.getKeyword().getType())) {
                 throw new RuntimeException("This Mapper is supposed to be used only with raw nuplets");
             }
-            try {
-                final Detector languageIdentifier = DetectorFactory.create();
-                languageIdentifier.append(nuplet.getKeyword().getValue());
-                final String detectedLanguage = languageIdentifier.detect();
+            final String detectedLanguage = TextTokenizer.detectLanguage(nuplet.getKeyword().getValue());
+            if (detectedLanguage != null) {
                 nuplet.setLang(detectedLanguage);
                 reporter.incrCounter(Counters.class.getName(), detectedLanguage, 1l);
-            } catch (LangDetectException ex) {
+            } else {
                 if (ItemType.NULL.equals(nuplet.getItem().getType())) {
                     reporter.incrCounter(Counters.NUPLETS_DISCARDED_BECAUSE_LANGUAGE_WAS_NOT_IDENTIFIED_AND_NO_ITEMS, 1l);
                     return;

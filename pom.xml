@@ -4,7 +4,7 @@
 
     <groupId>com.oboturov</groupId>
     <artifactId>ht</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <developers>

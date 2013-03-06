@@ -23,5 +23,5 @@ tweets_with_extracted_entities = FOREACH sanitized_tweets GENERATE $0, FLATTEN(c
 --dump tweets_with_extracted_entities;
 --(@gabanact,{(@SamanthaFoxx)},{(#MOA09)},{(http://bit.ly/1Lg4p)}, I mean I can agree Sunday)
 
-non_merged_tuples = FOREACH tweets_with_extracted_entities GENERATE $0 AS user_id:chararray, $1 AS mentions:bag {T: tuple(mention:chararray)}, $2 AS hashtags:bag {T: tuple(hashtag:chararray)}, com.oboturov.ht.pig.InvalidUrlRemover($3) AS urls:bag {T: tuple(url:chararray)}, $4 AS text:chararray;
---dump non_merged_tuples;
+non_merged_tuples = FOREACH tweets_with_extracted_entities GENERATE $0 AS user_id:chararray, $1 AS mentions:bag {T: tuple(mention:chararray)}, $2 AS hashtags:bag {T: tuple(hashtag:chararray)}, com.oboturov.ht.pig.InvalidUrlRemover($3) AS urls:bag {T: tuple(url:chararray)}, com.oboturov.ht.pig.TextTokenizer($4) AS tokens:bag {T: tuple(token:chararray)};
+dump non_merged_tuples;
