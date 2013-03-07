@@ -9,11 +9,9 @@
 
 REGISTER $UDF_JAR_FILE;
 
-DEFINE BagConcat datafu.pig.bags.BagConcat();
-
-tweets = LOAD '$DATASET_FILE' USING PigStorage('\t') AS (T, time, user_id:chararray, text:chararray);
+tweets = LOAD '$DATASET_FILE' USING PigStorage('\t') AS (time, user_id:chararray, text:chararray);
 --dump tweets;
---(T,2009-06-11 16:56:43,http://twitter.com/gabanact,@SamanthaFoxx I mean I can agree Sunday)
+--(2009-06-11 16:56:43,http://twitter.com/gabanact,@SamanthaFoxx I mean I can agree Sunday)
 
 normalized_tweets = FOREACH tweets GENERATE com.oboturov.ht.pig.SanitizeUserId(user_id) AS user_id:chararray, com.oboturov.ht.pig.SanitizeTweetText(text) AS text:chararray;
 --dump normalized_tweets;
