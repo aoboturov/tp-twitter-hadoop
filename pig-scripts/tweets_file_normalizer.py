@@ -1,3 +1,11 @@
-#!/bin/sh
+import fileinput
+import sys
 
-cat $1 | sed ':a;N;$!ba;s/\nU//g' | sed ':a;N;$!ba;s/\nW//g' | sed ':a;N;$!ba;s/\nT/T/g' > $1-prepared.txt
+for line in fileinput.input():
+    if not line.isspace():
+        line_split = line.split('\t')
+        sys.stdout.write(line_split[1].rstrip('\n'))
+        if line_split[0] == 'W':
+            sys.stdout.write('\n')
+        else:
+            sys.stdout.write('\t')
