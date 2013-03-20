@@ -59,7 +59,7 @@
             <properties>
                 <hadoop-compatible-log4j-version>1.2.15</hadoop-compatible-log4j-version>
                 <hadoop-distribution-version>1.0.3</hadoop-distribution-version>
-                <pig-distribution-version>0.9.2</pig-distribution-version>
+                <amazon-pig-distribution-version>0.9.2</amazon-pig-distribution-version>
                 <appended-profile-suffix>aws-emr</appended-profile-suffix>
             </properties>
             <dependencies>
@@ -70,9 +70,9 @@
                     <scope>provided</scope>
                 </dependency>
                 <dependency>
-                    <groupId>org.apache.pig</groupId>
+                    <groupId>com.amazon.pig</groupId>
                     <artifactId>pig</artifactId>
-                    <version>${pig-distribution-version}</version>
+                    <version>${amazon-pig-distribution-version}</version>
                     <scope>provided</scope>
                 </dependency>
             </dependencies>

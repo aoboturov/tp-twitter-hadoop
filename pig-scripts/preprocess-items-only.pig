@@ -3,7 +3,7 @@ set mapred.map.output.compression.code org.apache.hadoop.io.compress.GzipCodec
 set pig.tmpfilecompression true
 set pig.tmpfilecompression.codec org.apache.hadoop.io.compress.GzipCodec
 
-REGISTER s3://tp-twitter-data-analysis/processing-scripts/twitter-jobs-standalone-personal-server-jar-with-dependencies.jar;
+REGISTER s3://tp-twitter-data-analysis/processing-scripts/twitter-jobs-standalone-aws-emr-jar-with-dependencies.jar;
 
 DEFINE BagConcat datafu.pig.bags.BagConcat();
 
