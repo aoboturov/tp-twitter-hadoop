@@ -1,15 +1,11 @@
-/*
- * This script requires following parameters to be defined:
- *  - UDF_JAR_FILE
- *  - DATASET_FILE
- */
+set mapred.compress.map.output true
+set mapred.map.output.compression.code org.apache.hadoop.io.compress.GzipCodec
+set pig.tmpfilecompression true
+set pig.tmpfilecompression.codec org.apache.hadoop.io.compress.GzipCodec
 
---bin/pig -x local
---run -param_file test.params test.pig
+REGISTER s3://tp-twitter-data-analysis/processing-scripts/twitter-jobs-standalone-personal-server-jar-with-dependencies.jar;
 
-REGISTER $UDF_JAR_FILE;
-
-tweets = LOAD '$DATASET_FILE' USING PigStorage('\t') AS (time, user_id:chararray, text:chararray);
+tweets = LOAD '$INPUT' USING PigStorage('\t') AS (time, user_id:chararray, text:chararray);
 --dump tweets;
 --(2009-06-11 16:56:43,http://twitter.com/gabanact,@SamanthaFoxx I mean I can agree Sunday)
 
@@ -23,4 +19,4 @@ tweets_with_extracted_entities = FOREACH sanitized_tweets GENERATE $0, FLATTEN(c
 --dump tweets_with_extracted_entities;
 --(@gabanact,{(@SamanthaFoxx)},{(#MOA09)},{(http://bit.ly/1Lg4p)}, I mean I can agree Sunday)
 
-STORE tweets_with_extracted_entities INTO 'tweets_with_entities_extracted' USING PigStorage;
+STORE tweets_with_extracted_entities INTO '$OUTPUT' USING PigStorage;
