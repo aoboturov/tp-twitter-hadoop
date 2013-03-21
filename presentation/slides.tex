@@ -1,0 +1,210 @@
+\documentclass[handout]{beamer}
+\setbeameroption{show notes}
+% March  2013
+
+\usetheme{Berkeley}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{graphics}
+%\usepackage{pgfpages}
+\usepackage{psfrag}
+\usepackage{chicago}
+\usepackage{todonotes}
+\presetkeys{todonotes}{inline}{}
+\usepackage{nicefrac}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{listings}
+
+%\pgfpagelayout{2 on 1}[a4paper,border shrink=5mm]
+
+\setbeamertemplate{footline}[page number]
+
+\title[User similarity in Twitter]{\bf User similarity in Twitter}
+\author[A. Oboturov]{{\bf Artem Oboturov}\\ \texttt{oboturov@telecom-paristech.fr}}
+\date{March 22, 2013}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{\bf Table of Contents}
+\tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Problem statement}
+
+\subsection{What was expected}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{\bf What was expected}
+
+\begin{itemize}
+\item Similarity network (with Jaccard similarity measure) based on:
+\begin{enumerate}
+\item keywords
+\item items
+\item keywords and items together
+\end{enumerate}
+\item SimRank
+\item Data cleaning
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Available resources and frameworks}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{\bf Available resources and frameworks}
+
+\begin{itemize}
+\item Hadoop cluster Mariane @TELECOM ParisTech
+\item Hadoop Map Reduce Framework
+\item Apache Pig
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Data processing}
+
+\subsection{Pre-Treatement}
+
+% TODO: explain initial data format
+
+% TODO: explain what format was expected to be
+
+\subsubsection{Twitter-specific instances}
+
+% TODO: explain how twitter-text library was applied
+
+\subsubsection{Language detection}
+
+% TODO: explain how language detection was implemented
+
+\subsubsection{Stemming}
+
+% TODO: write about stemming
+
+\subsubsection{URI resolution}
+
+\subsection{Similarity network construction}
+
+\subsubsection{Hadoop/Pig cross join}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{\bf Hadoop/Pig cross join}
+
+\lstset{breaklines=true, escapeinside={||}{|>}}
+\begin{lstlisting}
+tuples_l = LOAD '$INPUT' AS (user_id_l:chararray, values_l:bag {T: tuple(item:chararray)});
+tuples_r = LOAD '$INPUT' AS (user_id_r:chararray, values_r:bag {T: tuple(item:chararray)});
+
+||
+\textcolor{red}{user\_user\_pairs = CROSS tuples\_l, tuples\_r;}
+|>
+
+user_user_pairs_similarity = FOREACH user_user_pairs GENERATE user_id_l, user_id_r, 1.0 - ((double)SIZE(DIFF(values_l, values_r)))/((double)SIZE(BagConcat(values_l, values_r))) AS sim:double;
+
+result_similarity = FILTER user_user_pairs_similarity BY user_id_l != user_id_r AND sim > 0.0;
+\end{lstlisting}
+
+\note{
+For 390 Mb file after 5 hrs of work consumes of about 35 Gb with temporary data.
+Not a feasible solution.
+Where this problem comes from?
+}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{\bf Looking at why it is slow: the Reduce Plan}
+
+\begin{verbatim}
+result_similarity: Store(...)
+|---Filter[bag]
+    |   ... Remove all pairs with zero similarity
+    |---user_user_pairs_similarity: New For Each(...)[bag]
+        |   Project[chararray][0]
+        |   Project[chararray][2]
+        |   Subtract[double]
+        |   ... Compute value of Jaccard similarity
+        |---result_similarity: Filter[bag]
+            |   ... Remove reflexive pairs
+            |---POJoinPackage(true,true)[tuple]
+\end{verbatim}
+
+Join is performed over splits of tuples of this structure:
+
+(\# of Mappers, $1 \leq n \leq $ \# of Mappers, $\ldots$ actual data)
+
+\note{
+This is the Reduce Plan for a Cross Join with with supplementary conditions.
+
+Tuples are joined on first field, which is simply a number of Mappers.
+}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{In-memory cross join}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{\bf In-memory cross join}
+
+We can play around caching all data on a processing unit with Large amount of RAM.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Implementation iterations}
+
+\subsection{Plain old Java + Hadoop Map-Reduce}
+
+\subsection{Python + Hadoop Map-Reduce}
+
+\subsection{Python + Pig UDF + Pig}
+
+\subsection{Python + Pig UDF + Pig + Java}
+
+\begin{frame}
+\frametitle{\bf }
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Conclusion and outlook}
+
+\begin{frame}
+\frametitle{\bf Results}
+
+Yet blank
+
+\end{frame}
+
+\end{document}
