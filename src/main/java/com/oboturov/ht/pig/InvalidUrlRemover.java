@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -77,12 +78,16 @@ public class InvalidUrlRemover extends EvalFunc<DataBag> {
                 if (!link.startsWith("http://") && !link.startsWith("https://")) {
                     link = "http://"+link;
                 }
-                final URL url = new URL(link);
-                if (isDeadShortenerUrl(url)) continue;
-                if (isValidShortenerUrl(url)) continue;
-                final Tuple correctUrl = new DefaultTuple();
-                correctUrl.append(link);
-                filteredUrls.add(correctUrl);
+                try {
+                    final URL url = new URL(link);
+                    if (isDeadShortenerUrl(url)) continue;
+                    if (isValidShortenerUrl(url)) continue;
+                    final Tuple correctUrl = new DefaultTuple();
+                    correctUrl.append(link);
+                    filteredUrls.add(correctUrl);
+                } catch (final MalformedURLException e) {
+                    // Do not add.
+                }
             }
             return filteredUrls;
         } catch (final Exception e) {
