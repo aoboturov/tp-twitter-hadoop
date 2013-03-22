@@ -1,8 +1,3 @@
---set mapred.compress.map.output true
---set mapred.map.output.compression.code org.apache.hadoop.io.compress.GzipCodec
---set pig.tmpfilecompression true
---set pig.tmpfilecompression.codec org.apache.hadoop.io.compress.GzipCodec
-
 REGISTER s3://tp-twitter-data-analysis/processing-scripts/twitter-jobs-standalone-aws-emr-jar-with-dependencies.jar;
 
 tweets = LOAD '$INPUT' USING PigStorage('\t') AS (time, user_id:chararray, text:chararray);
