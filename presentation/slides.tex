@@ -87,23 +87,102 @@
 
 \subsection{Pre-Treatement}
 
-% TODO: explain initial data format
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO: explain what format was expected to be
+\begin{frame}[fragile]
+\frametitle{\bf Dara Pre-Treatement}
+
+\begin{verbatim}
+T\t 2009-11-30 23:57:53
+U\t http://twitter.com/elissamazing
+W\t I just generated a #TweetCloud out of a year of
+      my tweets. Top three words: sleep, love, time -
+      http://w33.us/476r
+\end{verbatim}
+
+Data format:
+\begin{description}
+\item[T] Time of the tweet
+\item[U] Username of the author
+\item[W] Tweet content
+\end{description}
+    
+Python script was written to convert it to a (T, U, W) tuple by line file.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection{Twitter-specific instances}
 
-% TODO: explain how twitter-text library was applied
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{\bf Twitter-entities extraction}
+
+\begin{description}
+\item[Username] extraction and linking matches all valid Twitter usernames but does not verify that the username is a valid Twitter account.
+\item[Lists] auto-link and extract list names when they are written in @user/list-name format.
+\item[Hashtags] auto-link and extract hashtags, where a hashtag can contain most letters or numbers but cannot be solely numbers and cannot contain punctuation.
+\item[URLs]
+\end{description}
+
+The \url{https://github.com/twitter/twitter-text-java} Java library was used to perform this step.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection{Language detection}
 
-% TODO: explain how language detection was implemented
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{\bf Language detection}
+
+The N-Gram model\footnote{"N-Gram-Based Text Categorization" by William B. Cavnar and John M. Trenkle} library\footnote{"Language Detection Library for Java" by S. Nakatani} was used.
+It contains an embedded statistical model, i.e. parameters were estimated on a corpora, so no guarantee could be given on text or langauge which would differ in some substantial way.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection{Stemming}
 
-% TODO: write about stemming
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{\bf Stemming}
+
+Phrases normalization was done with the Apache Lucene\footnote{\url{http://lucene.apache.org}}.
+Lucene internally uses the Snowball\footnote{\url{http://snowball.tartarus.org}} and the Standard Porter’s stemmer (for English).
+Not all languages recognized on the Language detection step are supported by Lucene.
+Only those detected and supported by Lucene were considered for further analysis.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection{URI resolution}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{\bf URI resolution}
+
+First, a list of shortener services was created to distinguish between a normal URIs and a shortened ones. The list was compiled from data obtained from following sites:
+
+\begin{itemize}
+\item \url{http://code.google.com/p/shortenurl/wiki/URLShorteningServices}
+\item \url{http://www.tiny-url.info}
+\end{itemize}
+
+In order to resolve URIs a simple crawler could be used which sends HTTP HEAD requests and obtains a Location header value for the 302, 303 and 304 HTTP status codes (redirects).
+
+Resolution time is really slow and idea was abandoned.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Similarity network construction}
 
@@ -186,14 +265,46 @@ We can play around caching all data on a processing unit with Large amount of RA
 
 \subsection{Plain old Java + Hadoop Map-Reduce}
 
-\subsection{Python + Hadoop Map-Reduce}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Python + Pig UDF + Pig}
+\begin{frame}
+\frametitle{\bf Plain old Java + Hadoop Map-Reduce}
+
+\begin{itemize}
+\item Object model required for data representation (Plain old Java)
+\item Data serialization (with JSON in our case)
+\item Mappers and Reducer are written ad-hoc
+\item Input and output are handled manually
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Python + Pig UDF + Pig + Java}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{frame}
-\frametitle{\bf }
+\frametitle{\bf Python + Pig + Pig UDF + Java}
+
+\begin{itemize}
+\item Python provided simple scripts substituting bash scripts for such task s as data preprocessing and IO
+\item Pig was instrumental in working towards goal vs MR whos goal was MR freaking
+\item Pig UDF made reuse of existing code from first iteration straight-forward
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Scalability on AWS}
+
+\begin{frame}
+\frametitle{\bf Scalability on AWS}
+
+To perform data processing on real data set all code was ported to AWS.
+
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -203,7 +314,12 @@ We can play around caching all data on a processing unit with Large amount of RA
 \begin{frame}
 \frametitle{\bf Results}
 
-Yet blank
+\begin{enumerate}
+\item Tweets normalization \textcolor{blue}{was done}
+\item Code for similarity network construction \textcolor{blue}{was written and tested on small examples}, for actual data some processing resources are expected to be used
+\item For large loads scripts and package \textcolor{blue}{were ported} to the AWS EC2, S3 and EMR
+\item SimRank \textcolor{red}{was not implemented}
+\end{enumerate}
 
 \end{frame}
 
