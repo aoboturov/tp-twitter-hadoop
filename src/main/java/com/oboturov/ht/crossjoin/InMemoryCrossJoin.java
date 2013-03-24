@@ -5,10 +5,8 @@ import org.apache.pig.builtin.DIFF;
 import org.apache.pig.data.DefaultTuple;
 import org.apache.pig.data.Tuple;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.LineNumberReader;
-import java.util.ArrayList;
+import java.io.*;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * @author aoboturov
@@ -21,25 +19,27 @@ public class InMemoryCrossJoin {
     public static double threshold = 0.001;
 
     public static void main(final String args[]) throws Exception {
-        final LineNumberReader lineNumberReader = new LineNumberReader(
-                new FileReader(args[0]));
         final String schema = "user_id_l:chararray, values_l:bag {T: tuple(item:chararray)}";
         final PigStorageReaderSimplified storageReader = new PigStorageReaderSimplified(schema);
 
-        final ArrayList<Tuple> tuples = new ArrayList<Tuple>(2000000);
-        // Read all the tuples from storage.
-        String line = null;
-        while ( (line = lineNumberReader.readLine()) != null) {
-            tuples.add(storageReader.getNext(line));
-        }
-        final FileWriter fileWriter = new FileWriter(args[1]);
+        final OutputStream outputStream = new GZIPOutputStream(new FileOutputStream(args[1]));
+
         final DIFF diff = new DIFF();
         final BagConcat bagConcat = new BagConcat();
-        // Perform the Cross-Join.
-        for (int lCnt = 0; lCnt < tuples.size(); lCnt++) {
-            final Tuple leftTuple = tuples.get(lCnt);
-            for (int rCnt = 0; rCnt < tuples.size(); rCnt++) {
-                final Tuple rightTuple = tuples.get(rCnt);
+
+        // Read all the tuples from storage.
+        String leftLine = null, rightLine = null;
+        final LineNumberReader leftLineNumberReader = new LineNumberReader(
+                new FileReader(args[0]));
+        while ( (leftLine = leftLineNumberReader.readLine()) != null) {
+            final Tuple leftTuple = storageReader.getNext(leftLine);
+            final LineNumberReader rightLineNumberReader = new LineNumberReader(
+                    new FileReader(args[0]));
+            System.err.println(leftLine);
+
+            while ( (rightLine = rightLineNumberReader.readLine()) != null) {
+                final Tuple rightTuple = storageReader.getNext(rightLine);
+
                 final Tuple diffTuple = new DefaultTuple();
                 diffTuple.append(leftTuple.get(LIST));
                 diffTuple.append(rightTuple.get(LIST));
@@ -51,12 +51,11 @@ public class InMemoryCrossJoin {
                     sb.append(leftTuple.get(USER_NAME)).append("\t")
                             .append(rightTuple.get(USER_NAME)).append("\t")
                             .append(String.format("%.3f", sim)).append("\n");
-                    fileWriter.write(sb.toString());
-                    fileWriter.flush();
+                    outputStream.write(sb.toString().getBytes("UTF-8"));
                 }
+                outputStream.flush();
             }
         }
-        fileWriter.close();
     }
 
 }
