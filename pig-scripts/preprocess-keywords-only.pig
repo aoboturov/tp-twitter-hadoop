@@ -4,7 +4,9 @@ DEFINE BagConcat datafu.pig.bags.BagConcat();
 
 tweets_with_extracted_entities = LOAD '$INPUT' USING PigStorage AS (user_id:chararray, mentions:bag {T: tuple(mention:chararray)}, hashtags:bag {T: tuple(hashtag:chararray)}, urls:bag {T: tuple(url:chararray)}, text:chararray);
 
-non_merged_tuples_with_keywords_only = FOREACH tweets_with_extracted_entities GENERATE $0 AS user_id:chararray, com.oboturov.ht.pig.TextTokenizer($4) AS tokens:bag {T: tuple(token:chararray)};
+tweets_with_extracted_entities_having_non_empty_text = FILTER tweets_with_extracted_entities BY SIZE(TRIM(text)) > 0;
+
+non_merged_tuples_with_keywords_only = FOREACH tweets_with_extracted_entities_having_non_empty_text GENERATE $0 AS user_id:chararray, com.oboturov.ht.pig.TextTokenizer(TRIM($4)) AS tokens:bag {T: tuple(token:chararray)};
 --dump non_merged_tuples_with_keywords_only;
 --(@webkarnage,{(aa),(bb),(cc)})
 
