@@ -55,6 +55,59 @@
 
     <profiles>
         <profile>
+            <id>standalone</id>
+            <properties>
+                <hadoop-compatible-log4j-version>1.2.17</hadoop-compatible-log4j-version>
+                <hadoop-distribution-version>2.0.1-alpha</hadoop-distribution-version>
+                <appended-profile-suffix>standalone</appended-profile-suffix>
+                <pig-distribution-version>0.11.0</pig-distribution-version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-common</artifactId>
+                    <version>${hadoop-distribution-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <version>${hadoop-distribution-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.pig</groupId>
+                    <artifactId>pig</artifactId>
+                    <version>${pig-distribution-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.antlr</groupId>
+                    <artifactId>antlr-runtime</artifactId>
+                    <version>3.4</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.antlr</groupId>
+                    <artifactId>antlr</artifactId>
+                    <version>3.4</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.antlr</groupId>
+                    <artifactId>ST4</artifactId>
+                    <version>4.0.4</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                    <version>${hadoop-compatible-log4j-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>aws-emr</id>
             <properties>
                 <hadoop-compatible-log4j-version>1.2.15</hadoop-compatible-log4j-version>
