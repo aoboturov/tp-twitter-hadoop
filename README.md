@@ -3,15 +3,44 @@ tp-twitter-hadoop
 
 #TELECOM PT twitter data analysis project.
 
+## Description
+
+Starting from the Twitter dataset:
+
+*    http://snap.stanford.edu/data/bigdata/twitter7/tweets2009-06.txt.gz
+*    http://snap.stanford.edu/data/bigdata/twitter7/tweets2009-07.txt.gz
+*    http://snap.stanford.edu/data/bigdata/twitter7/tweets2009-08.txt.gz
+*    http://snap.stanford.edu/data/bigdata/twitter7/tweets2009-09.txt.gz
+*    http://snap.stanford.edu/data/bigdata/twitter7/tweets2009-10.txt.gz
+*    http://snap.stanford.edu/data/bigdata/twitter7/tweets2009-11.txt.gz
+*    http://snap.stanford.edu/data/bigdata/twitter7/tweets2009-12.txt.gz
+
+One can generate similarity network (with Jaccard similarity measure) between users whose tweets present there.
+
 ## Project compilation
 
-This is a Hadoop Java client. It supports two set APIs:
+This is a Hadoop Java client. It supports two sets of maven profiles:
 
 *    v0.20.205.0 (the `mariane` profile);
-*    v2.0.1-alpha (the `personal-server` profile).
+*    v2.0.1-alpha (the `personal-server` profile);
+*    v1.0.3 (the `aws-emr` profile);
+*    with Pig embedded (the `standalone` profile).
 
 To build project one should call Maven 3:
-`mvn -P${my_profile_name} clean package assembly:single`
+`mvn -P ${my_profile_name} clean package assembly:single`
+
+# Second iteration (to be used with AWS-EMR)
+
+Project was realised with Pig, Hadoop, some Python and Java.
+
+To process data these actions should be executed:
+
+* First data must be treated with `/pig-scripts/tweets_file_normalizer.py` to produce a tuple per row data instead of four-lined format of entries.
+* Then the `/pig-scripts/tweets-preprocessing.pig` should be launched to produce Pig relations of form: `(user_id:chararray, mentions:bag {T: tuple(mention:chararray)}, hashtags:bag {T: tuple(hashtag:chararray)}, urls:bag {T: tuple(url:chararray)}, text:chararray)`. Those relations are basis for similarity network construction.
+* `/pig-scripts/preprocess-items-only.pig` and `/pig-scripts/preprocess-keywords-only.pig` construct tuples with items only and with keywords only. Joint similarity (by items and keywords) could be dudeced in a similar fashion.
+* To generate a similarity network from ouput of a previous step one should execute the following Java program: `java -Xmx1024m -cp twitter-jobs-standalone-standalone-jar-with-dependencies.jar com.oboturov.ht.crossjoin.InMemoryCrossJoin part-r-00000 jaccard-sim.zip`. Action is time and space consuming.
+
+# Fist iteration (not to be used in production)
 
 ## Improtant considerations for data processing with Hadoop
 

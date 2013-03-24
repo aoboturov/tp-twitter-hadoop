@@ -18,6 +18,10 @@ public class InMemoryCrossJoin {
 
     public static double threshold = 0.001;
 
+    /**
+     * @param args expected file path for input file and output file as parameters.
+     * @throws Exception if processing error occurs.
+     */
     public static void main(final String args[]) throws Exception {
         final String schema = "user_id_l:chararray, values_l:bag {T: tuple(item:chararray)}";
         final PigStorageReaderSimplified storageReader = new PigStorageReaderSimplified(schema);
