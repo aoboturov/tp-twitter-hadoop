@@ -257,6 +257,10 @@ Tuples are joined on first field, which is simply a number of Mappers.
 
 We can play around caching all data on a processing unit with Large amount of RAM.
 
+But the size of data to be loaded to memory is too large.
+
+An easier way was to make file-on-demand reading of records, which evaded from problems with lack of RAM and JVM stack space during execution.
+
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -305,6 +309,10 @@ We can play around caching all data on a processing unit with Large amount of RA
 
 To perform data processing on real data set all code was ported to AWS.
 
+Data sets were generated.
+
+Similarity network dataset was not generated because of time constraints.
+
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -318,7 +326,8 @@ To perform data processing on real data set all code was ported to AWS.
 \item Tweets normalization \textcolor{blue}{was done}
 \item Code for similarity network construction \textcolor{blue}{was written and tested on small examples}, for actual data some processing resources are expected to be used
 \item For large loads scripts and package \textcolor{blue}{were ported} to the AWS EC2, S3 and EMR
-\item SimRank \textcolor{red}{was not implemented}
+\item similarity network program \textcolor{blue}{was written}
+\item PageRank and  SimRank \textcolor{red}{were not implemented}
 \end{enumerate}
 
 \includegraphics[height=90px]{work-activity.png}
