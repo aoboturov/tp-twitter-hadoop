@@ -20,13 +20,13 @@ import java.util.ArrayList;
  */
 public class PigStorageReaderSimplified {
 
-    private byte fieldDel = '\t';
-    private String serializedSchema;
+    private final byte fieldDel = '\t';
+    private final ResourceSchema schema;
 
     private TupleFactory mTupleFactory = TupleFactory.getInstance();
 
-    public PigStorageReaderSimplified(final String schema) {
-        serializedSchema = schema;
+    public PigStorageReaderSimplified(final String schema) throws Exception {
+        this.schema = new ResourceSchema(Utils.getSchemaFromString(schema));
     }
 
     private void addTupleValue(ArrayList<Object> tuple, byte[] buf, int start, int end) {
@@ -84,11 +84,8 @@ public class PigStorageReaderSimplified {
     }
 
     private Tuple applySchema(Tuple tup) throws IOException {
+        final ResourceSchema.ResourceFieldSchema[] fieldSchemas = schema.getFields();
         final LoadCaster caster = getLoadCaster();
-        final ResourceSchema schema;
-        schema = new ResourceSchema(Utils.getSchemaFromString(serializedSchema));
-
-        ResourceSchema.ResourceFieldSchema[] fieldSchemas = schema.getFields();
         int tupleIdx = 0;
         // If some fields have been projected out, the tuple
         // only contains required fields.

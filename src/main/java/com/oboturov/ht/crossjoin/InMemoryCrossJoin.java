@@ -8,7 +8,7 @@ import org.apache.pig.data.Tuple;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.LineNumberReader;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 /**
  * @author aoboturov
@@ -26,7 +26,7 @@ public class InMemoryCrossJoin {
         final String schema = "user_id_l:chararray, values_l:bag {T: tuple(item:chararray)}";
         final PigStorageReaderSimplified storageReader = new PigStorageReaderSimplified(schema);
 
-        final LinkedList<Tuple> tuples = new LinkedList<Tuple>();
+        final ArrayList<Tuple> tuples = new ArrayList<Tuple>(2000000);
         // Read all the tuples from storage.
         String line = null;
         while ( (line = lineNumberReader.readLine()) != null) {
@@ -36,8 +36,10 @@ public class InMemoryCrossJoin {
         final DIFF diff = new DIFF();
         final BagConcat bagConcat = new BagConcat();
         // Perform the Cross-Join.
-        for (final Tuple leftTuple : tuples) {
-            for (final Tuple rightTuple : tuples) {
+        for (int lCnt = 0; lCnt < tuples.size(); lCnt++) {
+            final Tuple leftTuple = tuples.get(lCnt);
+            for (int rCnt = 0; rCnt < tuples.size(); rCnt++) {
+                final Tuple rightTuple = tuples.get(rCnt);
                 final Tuple diffTuple = new DefaultTuple();
                 diffTuple.append(leftTuple.get(LIST));
                 diffTuple.append(rightTuple.get(LIST));
@@ -50,6 +52,7 @@ public class InMemoryCrossJoin {
                             .append(rightTuple.get(USER_NAME)).append("\t")
                             .append(String.format("%.3f", sim)).append("\n");
                     fileWriter.write(sb.toString());
+                    fileWriter.flush();
                 }
             }
         }
